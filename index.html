@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#FBF7F0" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Kitchen" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23FBF7F0'/%3E%3Cpath d='M30 22v26a10 10 0 0 0 20 0V22' fill='none' stroke='%232F5D50' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M40 48v30' stroke='%232F5D50' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M68 22c-6 4-8 12-8 20s3 10 8 10' fill='none' stroke='%23C4703F' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M68 52v26' stroke='%23C4703F' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E" />
+<title>Kitchen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{--paper:#FBF7F0;--card:#FFF;--sink:#F2EDE3;--ink:#23261F;--ink-soft:#5C6156;--muted:#8E9284;
+    --green:#2F5D50;--terra:#C4703F;--rule:rgba(35,38,31,.12);--rule-soft:rgba(35,38,31,.07);
+    --due:#B3541E;--red:#A63D2F;--ok:#2F5D50;}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.5;
+    padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 60px);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:640px;margin:0 auto;padding:0 18px;}
+  .head{padding:26px 0 6px;}
+  .brand{font-family:'Fraunces',serif;font-weight:600;letter-spacing:.18em;text-transform:uppercase;font-size:12px;color:var(--terra);}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(28px,7vw,38px);line-height:1.05;margin:5px 0 2px;}
+  .sub{color:var(--ink-soft);font-size:14px;}
+  .tabs{display:flex;gap:6px;margin:18px 0 4px;background:var(--sink);padding:5px;border-radius:12px;}
+  .tab{flex:1;border:none;background:transparent;cursor:pointer;padding:10px 6px;border-radius:8px;font-weight:600;font-size:14px;color:var(--ink-soft);font-family:'Inter',sans-serif;}
+  .tab.on{background:var(--card);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,.07);}
+  .tab:focus-visible{outline:3px solid var(--terra);outline-offset:2px;}
+  .card{background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:20px;margin-top:16px;}
+  .label{font-family:'Fraunces',serif;font-weight:600;letter-spacing:.16em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:6px;}
+  .meal{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(26px,7vw,36px);line-height:1.1;margin:2px 0 8px;}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .chip{font-size:13px;background:var(--sink);border-radius:999px;padding:6px 12px;color:var(--ink-soft);}
+  .chip b{color:var(--ink);font-weight:600;}
+  .chip.time{background:rgba(47,93,80,.1);color:var(--green);}
+  .chip.time b{color:var(--green);}
+  .noteline{margin-top:14px;padding:12px 14px;background:var(--sink);border-radius:10px;font-size:14px;color:var(--ink-soft);}
+  .noteline b{color:var(--ink);font-weight:600;display:block;margin-bottom:2px;font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-family:'Fraunces',serif;}
+  .noteline.warn{background:rgba(196,112,63,.1);}
+  .noteline.warn b{color:var(--terra);}
+  .ing{margin-top:16px;}
+  .ing-h{font-family:'Fraunces',serif;font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .ing-list span{display:inline-block;background:var(--sink);border-radius:6px;padding:5px 10px;margin:0 6px 6px 0;font-size:14px;}
+  .ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:4px;}
+  .field{flex:1;min-width:130px;}
+  .field label{display:block;font-size:12px;font-family:'Fraunces',serif;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;font-weight:600;}
+  .field input,.field select{width:100%;padding:11px 12px;border:1px solid var(--rule);border-radius:10px;font-family:'Inter',sans-serif;font-size:15px;background:var(--card);color:var(--ink);}
+  .btn{border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:15px;padding:13px 20px;border-radius:10px;background:var(--green);color:#fff;}
+  .btn:active{background:#254a40;}
+  .btn:focus-visible{outline:3px solid var(--terra);outline-offset:2px;}
+  .btn.wide{width:100%;margin-top:16px;}
+  .covering{margin-top:14px;font-size:14px;color:var(--ink-soft);}
+  .covering b{color:var(--ink);}
+  .mealpills{margin-top:10px;}
+  .mealpills span{display:inline-block;font-size:13px;background:var(--sink);border-radius:999px;padding:5px 11px;margin:0 5px 5px 0;color:var(--ink-soft);}
+  /* budget */
+  .budget{margin-top:16px;background:var(--card);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;}
+  .b-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+  .b-total{font-family:'Fraunces',serif;font-weight:700;font-size:32px;line-height:1;}
+  .b-total.over{color:var(--red);}
+  .b-total.warn{color:#B3541E;}
+  .b-total.ok{color:var(--ok);}
+  .b-target{font-size:13px;color:var(--muted);text-align:right;}
+  .b-bar{margin-top:12px;height:8px;border-radius:8px;background:var(--sink);overflow:hidden;position:relative;}
+  .b-bar>i{display:block;height:100%;background:var(--ok);transition:width .3s ease;}
+  .b-bar>i.over{background:var(--red);}
+  .b-bar>i.warn{background:#D98A3D;}
+  @media(prefers-reduced-motion:reduce){.b-bar>i{transition:none;}}
+  .b-msg{margin-top:10px;font-size:13.5px;color:var(--ink-soft);}
+  .b-msg.over{color:var(--red);font-weight:500;}
+  .b-msg.warn{color:#B3541E;font-weight:500;}
+  .trim{margin-top:14px;padding:14px;background:rgba(166,61,47,.07);border-radius:10px;}
+  .trim-h{font-family:'Fraunces',serif;font-weight:600;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:8px;}
+  .trim-row{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:14px;border-bottom:1px solid rgba(166,61,47,.12);}
+  .trim-row:last-child{border-bottom:none;}
+  .trim-row .tn{flex:1;}
+  .trim-row .tp{color:var(--ink-soft);font-size:13px;}
+  .tbtn{border:1px solid rgba(166,61,47,.35);background:transparent;color:var(--red);border-radius:999px;padding:5px 11px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+  .tbtn.on{background:var(--red);color:#fff;}
+  .sec{margin-top:22px;}
+  .sec-h{display:flex;align-items:baseline;justify-content:space-between;font-family:'Fraunces',serif;font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);padding-bottom:7px;border-bottom:2px solid rgba(47,93,80,.18);margin-bottom:4px;}
+  .sec-h .cnt{font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:500;}
+  .item{display:flex;align-items:flex-start;gap:12px;padding:11px 2px;border-bottom:1px solid var(--rule-soft);}
+  .item.done .i-name{text-decoration:line-through;color:var(--muted);}
+  .item.deferred{opacity:.4;}
+  .box{flex:0 0 22px;width:22px;height:22px;margin-top:1px;border-radius:6px;border:2px solid var(--muted);background:transparent;cursor:pointer;display:grid;place-items:center;padding:0;}
+  .item.done .box{background:var(--green);border-color:var(--green);}
+  .box svg{width:13px;height:13px;opacity:0;}
+  .item.done .box svg{opacity:1;}
+  .box:focus-visible{outline:3px solid var(--terra);outline-offset:2px;}
+  .i-body{flex:1;min-width:0;}
+  .i-name{font-size:15px;font-weight:500;}
+  .i-why{font-size:12.5px;color:var(--muted);margin-top:1px;}
+  .i-why.due{color:var(--due);font-weight:500;}
+  .i-right{text-align:right;white-space:nowrap;padding-top:1px;}
+  .i-qty{font-size:13px;color:var(--ink-soft);}
+  .i-price{font-size:12px;color:var(--muted);}
+  .empty{padding:16px 2px;color:var(--muted);font-size:14px;font-style:italic;}
+  .weekrow{display:flex;align-items:baseline;gap:12px;padding:12px 2px;border-bottom:1px solid var(--rule-soft);}
+  .weekrow.today .w-day{color:var(--terra);}
+  .weekrow.today .w-meal{font-weight:600;}
+  .w-day{font-family:'Fraunces',serif;font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--green);width:72px;flex:0 0 72px;}
+  .w-meal{font-size:15px;flex:1;}
+  .w-fun{font-size:11px;color:var(--terra);background:rgba(196,112,63,.12);border-radius:999px;padding:3px 8px;}
+  .foot{color:var(--muted);font-size:12.5px;margin-top:26px;line-height:1.6;}
+  .foot b{color:var(--ink-soft);}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="brand">Cents of Peace Household</div>
+    <h1 id="title">Kitchen</h1>
+    <div class="sub" id="sub"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab on" id="t-tonight">Tonight</button>
+    <button class="tab" id="t-shop">Shop</button>
+    <button class="tab" id="t-week">Week</button>
+  </div>
+  <div id="v-tonight"></div>
+  <div id="v-shop" class="hidden"></div>
+  <div id="v-week" class="hidden"></div>
+  <div class="foot" id="foot"></div>
+</div>
+<script>
+(function(){
+"use strict";
+var ANCHOR=new Date(2026,5,21);
+var SUMMER=[
+ ["Grilled hot dogs / brats","Chicken stir fry","Baked penne","Sausage + peppers","Chicken alfredo","Taco bar","Homemade pizza"],
+ ["Chicken fajitas","Grilled burgers","Chicken chow mein","Breakfast for dinner","Spaghetti + meatballs","Grilled chicken + potatoes","Smoked lasagna"],
+ ["Grilled pork chops + salad","Shrimp + chicken stir fry","Taco bar","Baked pork chops + potatoes","Chicken enchiladas","Grilled burgers + corn","Homemade pizza"],
+ ["Teriyaki chicken + rice","Spaghetti","Potstickers + chicken fried rice","Grilled brats + veg","Sloppy joes","Grilled BBQ chicken + corn","Baked nachos"]];
+var FALL=[
+ ["Chicken + rice casserole","Spaghetti + meatballs","Sausage + peppers","Chicken tortilla soup","Slow cooker pot roast","Grilled BBQ chicken","Smoked lasagna"],
+ ["Breakfast for dinner","Chicken chow mein","Baked penne","Baked pork chops + potatoes","Chicken alfredo","Baked nachos","Grilled pork chops + salad"],
+ ["Teriyaki chicken + rice","Chili + cornbread","Chicken enchiladas","Sloppy joes","Chicken stir fry","Grilled brats + veg","Taco bar"],
+ ["Chicken noodle soup","Spaghetti","Chicken fajitas","Beef stew","Potstickers + chicken fried rice","Grilled burgers","Homemade pizza"]];
+var WINTER=[
+ ["Chicken pot pie","Spaghetti + meatballs","Sausage + peppers","Teriyaki chicken + rice","Baked penne","Nuggets + fries + veg","Smoked lasagna"],
+ ["Chicken tortilla soup","Spaghetti","Baked pork chops + potatoes","Chicken stir fry","Meatloaf + mashed potatoes","Homemade pizza","Chili + cornbread"],
+ ["Chicken enchiladas","Beef stew","Chicken alfredo","Baked nachos","Chicken noodle soup","Taco bar","Breakfast for dinner"],
+ ["Chicken fajitas","Sloppy joes","Chicken chow mein","Slow cooker pot roast","Potstickers + chicken fried rice","Homemade pizza","Taco soup"]];
+var SPRING=[
+ ["Chicken fajitas","Sausage + peppers","Grilled chicken + potatoes","Baked nachos","Chicken alfredo","Grilled hot dogs / brats","Taco bar"],
+ ["Shrimp + chicken stir fry","Breakfast for dinner","Teriyaki chicken + rice","Sloppy joes","Chicken enchiladas","Homemade pizza","Grilled BBQ chicken + corn"],
+ ["Baked penne","Chicken chow mein","Grilled brats + veg","Potstickers + chicken fried rice","Spaghetti","Nuggets + fries + veg","Grilled burgers"],
+ ["Chicken stir fry","Baked pork chops + potatoes","Chicken tortilla soup","Spaghetti + meatballs","Chicken + rice casserole","Grilled pork chops + salad","Smoked lasagna"]];
+var G=[
+ {id:"fcorn",wid:"659879040",n:"Frozen whole kernel corn, 12 oz",q:1,p:0.98,s:"Frozen",cad:0,trig:["Chicken tortilla soup","Taco soup"]},
+ {id:"shells",wid:"1657981925",n:"Taco shells, 12 ct",q:1,p:1.50,s:"Bread",cad:14},
+ {id:"bcrumb",wid:"10315089",n:"Plain bread crumbs, 15 oz",q:1,p:1.22,s:"Backstock",cad:0,trig:["Meatloaf + mashed potatoes"]},
+ {id:"ketch",wid:"616064227",n:"Heinz ketchup, no sugar added",q:1,p:5.78,s:"Backstock",cad:60,flex:1},
+ {id:"kinder",wid:"887790491",n:"Kinder's The Blend seasoning",q:1,p:4.98,s:"Backstock",cad:60,flex:1},
+ {id:"beef",wid:"47183723",n:"Ground beef 93/7, 3 lb roll",q:1,p:19.87,s:"Protein",cad:7},
+ {id:"thighs",wid:"51259017",n:"Chicken thighs boneless, 3 lb",q:1,p:9.87,s:"Protein",cad:7},
+ {id:"diced",wid:"621164712",n:"Frozen diced chicken breast, 2 lb",q:2,p:7.94,s:"Protein",cad:7},
+ {id:"isaus",wid:"40711369",n:"Italian sausage, 1 lb",q:1,p:3.92,s:"Protein",cad:7},
+ {id:"brats",wid:"22210872",n:"Brats, 6 links",q:1,p:4.46,s:"Protein",cad:7},
+ {id:"kielbasa",wid:"5265533849",n:"Kielbasa, 14 oz",q:1,p:2.97,s:"Protein",cad:7},
+ {id:"eggs",wid:"605434510",n:"Eggs, 36 ct",q:1,p:4.32,s:"Protein",cad:7},
+ {id:"deli",wid:"14551074",n:"Deli ham lunchmeat, 16 oz",q:1,p:6.48,s:"Protein",cad:7},
+ {id:"bacon",wid:"44391087",n:"Bacon, thick cut 16 oz",q:1,p:4.18,s:"Protein",cad:14},
+ {id:"pep",wid:"40495518",n:"Pepperoni, 6 oz",q:1,p:2.88,s:"Protein",cad:14,trig:["Homemade pizza"]},
+ {id:"chops",wid:"20627151",n:"Pork loin chops, family pack 6 ct",q:2,p:14.45,s:"Protein",cad:0,trig:["Baked pork chops + potatoes","Grilled pork chops + salad"]},
+ {id:"dogs",wid:"34632371",n:"Hot dogs, 8 ct",q:1,p:2.84,s:"Protein",cad:0,trig:["Grilled hot dogs / brats"]},
+ {id:"roast",wid:"21553575",n:"Chuck roast",q:1,p:22.81,s:"Protein",cad:0,trig:["Slow cooker pot roast","Beef stew"]},
+ {id:"milk",wid:"10450114",n:"Whole milk, gallon",q:1,p:3.80,s:"Dairy",cad:7},
+ {id:"fiesta",wid:"10452468",n:"Fiesta shredded cheese, 32 oz",q:1,p:6.92,s:"Dairy",cad:7},
+ {id:"mozz",wid:"10452490",n:"Mozzarella shredded, 16 oz",q:1,p:3.48,s:"Dairy",cad:7},
+ {id:"yog",wid:"26559565",n:"Greek yogurt, 32 oz",q:1,p:3.28,s:"Dairy",cad:7},
+ {id:"cott",wid:"10315043",n:"Cottage cheese, 24 oz",q:1,p:2.87,s:"Dairy",cad:7},
+ {id:"sour",wid:"12335111",n:"Sour cream, 16 oz",q:1,p:1.84,s:"Dairy",cad:7},
+ {id:"butter",wid:"132893363",n:"Butter, 16 oz",q:1,p:3.06,s:"Dairy",cad:7},
+ {id:"slices",wid:"15077514",n:"Cheese slices, sharp cheddar",q:2,p:1.67,s:"Dairy",cad:7},
+ {id:"ched",wid:"10452477",n:"Sharp cheddar shredded, 16 oz",q:1,p:3.48,s:"Dairy",cad:14},
+ {id:"parm",wid:"10452414",n:"Parmesan shredded, 6 oz",q:1,p:2.08,s:"Dairy",cad:14},
+ {id:"ric",wid:"10316631",n:"Ricotta, 15 oz",q:1,p:2.67,s:"Dairy",cad:0,trig:["Baked penne"]},
+ {id:"onion",wid:"10447842",n:"Yellow onions, 3 lb",q:1,p:3.13,s:"Produce",cad:14},
+ {id:"bell",wid:"47770124",n:"Bell peppers, 3 ct",q:1,p:2.97,s:"Produce",cad:7},
+ {id:"gbell",wid:"44390945",n:"Green bell pepper",q:1,p:0.86,s:"Produce",cad:14,trig:["Homemade pizza"]},
+ {id:"mush",wid:"10449184",n:"Sliced mushrooms, 8 oz",q:1,p:2.00,s:"Produce",cad:14,trig:["Homemade pizza"]},
+ {id:"carrot",wid:"44391001",n:"Carrot chips, 1 lb",q:1,p:2.07,s:"Produce",cad:14},
+ {id:"celery",wid:"51259411",n:"Celery",q:1,p:2.37,s:"Produce",cad:0,trig:["Beef stew","Chicken noodle soup","Chicken pot pie"]},
+ {id:"slaw",wid:"16785076",n:"Coleslaw mix, 16 oz",q:1,p:1.97,s:"Produce",cad:0,trig:["Chicken chow mein"]},
+ {id:"cil",wid:"160597260",n:"Cilantro bunch",q:1,p:0.93,s:"Produce",cad:7},
+ {id:"salad",wid:"19400285",n:"Romaine salad blend, 18 oz",q:1,p:5.42,s:"Produce",cad:7},
+ {id:"spin",wid:"13893738",n:"Spinach, 10 oz",q:1,p:2.00,s:"Produce",cad:7},
+ {id:"cuke",wid:"44419690",n:"Mini cucumbers, 16 oz",q:1,p:2.08,s:"Produce",cad:7},
+ {id:"tom",wid:"44390955",n:"Tomatoes on the vine",q:1,p:3.76,s:"Produce",cad:14},
+ {id:"corn",wid:"44391430",n:"Sweet corn on the cob",q:6,p:0.33,s:"Produce",cad:7,sn:"summer"},
+ {id:"pot",wid:"10447837",n:"Russet potatoes, 5 lb",q:1,p:2.84,s:"Produce",cad:14},
+ {id:"avo",wid:"44390968",n:"Avocados, 5-6 ct bag",q:1,p:3.48,s:"Produce",cad:7},
+ {id:"ban",wid:"44390948",n:"Bananas",q:6,p:0.20,s:"Produce",cad:7},
+ {id:"apple",wid:"44390958",n:"Gala apples, 3 lb",q:1,p:3.24,s:"Produce",cad:14},
+ {id:"grape",wid:"47770140",n:"Red seedless grapes",q:1,p:4.21,s:"Produce",cad:7},
+ {id:"straw",wid:"22660282",n:"Strawberries, 2 lb",q:1,p:4.72,s:"Produce",cad:7},
+ {id:"broc",wid:"745725724",n:"Broccoli florets, 32 oz",q:1,p:2.88,s:"Frozen",cad:7},
+ {id:"peas",wid:"443429457",n:"Sweet peas, 12 oz",q:1,p:0.98,s:"Frozen",cad:7},
+ {id:"gbean",wid:"872271913",n:"Green beans, 12 oz",q:1,p:1.97,s:"Frozen",cad:7},
+ {id:"fries",wid:"10534214",n:"Fries, 32 oz",q:1,p:2.97,s:"Frozen",cad:7},
+ {id:"hash",wid:"47360083",n:"Hash browns O'Brien, 28 oz",q:1,p:3.42,s:"Frozen",cad:14},
+ {id:"ffruit",wid:"672666564",n:"Frozen strawberries, 64 oz",q:1,p:9.82,s:"Frozen",cad:14},
+ {id:"nugg",wid:"51259447",n:"Chicken nuggets, 32 oz",q:1,p:5.97,s:"Frozen",cad:14},
+ {id:"uncr",wid:"196027434",n:"Uncrustables, 15 ct",q:1,p:14.54,s:"Frozen",cad:14,flex:1},
+ {id:"shrimp",wid:"44391062",n:"Frozen shrimp, 12 oz",q:1,p:7.42,s:"Frozen",cad:0,trig:["Shrimp + chicken stir fry"]},
+ {id:"lasg",wid:"24107864",n:"Frozen lasagna, 90 oz",q:1,p:14.87,s:"Frozen",cad:0,trig:["Smoked lasagna"]},
+ {id:"mball",wid:"54479594",n:"Frozen meatballs, 48 oz",q:1,p:11.47,s:"Frozen",cad:0,trig:["Spaghetti + meatballs"]},
+ {id:"pstick",wid:"33426037",n:"Chicken potstickers, 46.5 oz",q:1,p:12.46,s:"Frozen",cad:0,trig:["Potstickers + chicken fried rice"]},
+ {id:"gbread",wid:"10533811",n:"Garlic bread, 16 oz",q:1,p:2.67,s:"Frozen",cad:0,trig:["Spaghetti + meatballs","Smoked lasagna"]},
+ {id:"pasta",wid:"10534084",n:"Penne pasta, 16 oz",q:1,p:1.24,s:"Pantry",cad:7},
+ {id:"spag",wid:"10534115",n:"Spaghetti, 16 oz",q:1,p:1.24,s:"Pantry",cad:7},
+ {id:"rice",wid:"10315395",n:"Long grain rice, 5 lb",q:1,p:3.37,s:"Pantry",cad:14},
+ {id:"black",wid:"10534038",n:"Black beans, 15 oz",q:2,p:0.86,s:"Pantry",cad:7},
+ {id:"refr",wid:"10451542",n:"Refried beans, 16 oz",q:2,p:1.00,s:"Pantry",cad:7},
+ {id:"rotel",wid:"10308581",n:"Rotel, 10 oz",q:2,p:1.48,s:"Pantry",cad:7},
+ {id:"marin",wid:"10307632",n:"Classico pasta sauce, 24 oz",q:1,p:2.88,s:"Pantry",cad:7},
+ {id:"salsa",wid:"3302133555",n:"Salsa, 16 oz",q:1,p:1.97,s:"Pantry",cad:7},
+ {id:"chips",wid:"12335104",n:"Tortilla chips, 13 oz",q:2,p:2.17,s:"Pantry",cad:7},
+ {id:"ramen",wid:"10450904",n:"Ramen, 12 pk",q:1,p:3.87,s:"Pantry",cad:14,flex:1},
+ {id:"jam",wid:"10315691",n:"Sugar-free strawberry jam",q:1,p:3.12,s:"Pantry",cad:30,flex:1},
+ {id:"olive",wid:"10315447",n:"Sliced black olives",q:1,p:1.82,s:"Pantry",cad:14,trig:["Homemade pizza"]},
+ {id:"pizsc",wid:"12444468",n:"Pizza sauce, 14 oz",q:1,p:1.22,s:"Pantry",cad:14,trig:["Homemade pizza"]},
+ {id:"chili",wid:"10534044",n:"Chili beans, 15.5 oz",q:2,p:0.86,s:"Pantry",cad:0,trig:["Chili + cornbread"]},
+ {id:"kid",wid:"10534045",n:"Kidney beans, 15.5 oz",q:2,p:0.86,s:"Pantry",cad:0,trig:["Chili + cornbread","Taco soup"]},
+ {id:"tsauce",wid:"10415500",n:"Tomato sauce, 15 oz",q:2,p:0.92,s:"Pantry",cad:0,trig:["Chili + cornbread","Sloppy joes"]},
+ {id:"cbread",wid:"10448133",n:"Jiffy corn muffin mix",q:2,p:0.72,s:"Pantry",cad:0,trig:["Chili + cornbread"]},
+ {id:"bbroth",wid:"10899014",n:"Beef broth, 32 oz",q:2,p:1.50,s:"Pantry",cad:0,trig:["Slow cooker pot roast","Beef stew"]},
+ {id:"cbroth",wid:"10899013",n:"Chicken broth, 32 oz",q:2,p:1.50,s:"Pantry",cad:0,trig:["Chicken tortilla soup","Chicken noodle soup","Chicken pot pie","Chicken + rice casserole","Taco soup"]},
+ {id:"bread",wid:"10804551",n:"Whole wheat bread, 20 oz",q:1,p:1.97,s:"Bread",cad:7},
+ {id:"ftort",wid:"10535374",n:"Flour tortillas, 12 ct",q:1,p:2.68,s:"Bread",cad:7},
+ {id:"hbun",wid:"10450104",n:"Hamburger buns, 8 ct",q:1,p:1.48,s:"Bread",cad:7},
+ {id:"dbun",wid:"10450133",n:"Hot dog buns, 8 ct",q:1,p:1.48,s:"Bread",cad:0,trig:["Grilled hot dogs / brats","Grilled brats + veg"]},
+ {id:"ctort",wid:"14140865",n:"Corn tortillas, 30 ct",q:1,p:2.48,s:"Bread",cad:14},
+ {id:"bisc",wid:"10448401",n:"Biscuits, 8 ct",q:1,p:1.96,s:"Bread",cad:0,trig:["Breakfast for dinner","Chicken pot pie"]},
+ {id:"cer",wid:"127399616",n:"Cereal, 18 oz",q:1,p:2.67,s:"Breakfast & Snacks",cad:7},
+ {id:"oats",wid:"10314925",n:"Old fashioned oats, 42 oz",q:1,p:4.18,s:"Breakfast & Snacks",cad:14},
+ {id:"gran",wid:"137927272",n:"Granola, 17 oz",q:1,p:5.98,s:"Breakfast & Snacks",cad:14},
+ {id:"humm",wid:"110895339",n:"Hummus, 10 oz",q:1,p:2.87,s:"Breakfast & Snacks",cad:14},
+ {id:"crack",wid:"25752102",n:"Pita crackers, 9.5 oz",q:1,p:3.97,s:"Breakfast & Snacks",cad:14},
+ {id:"chipbox",wid:"5395277645",n:"Variety chip box, 30 ct",q:1,p:11.37,s:"Breakfast & Snacks",cad:7},
+ {id:"trail",wid:"239527508",n:"Trail mix, 40 oz",q:1,p:9.38,s:"Breakfast & Snacks",cad:14,flex:1},
+ {id:"gbar",wid:"199825121",n:"Granola bars, 20 ct",q:1,p:6.94,s:"Breakfast & Snacks",cad:14},
+ {id:"apps",wid:"406077371",n:"Applesauce pouches, 12 ct",q:1,p:6.84,s:"Breakfast & Snacks",cad:7},
+ {id:"string",wid:"357809532",n:"String cheese, 24 ct",q:1,p:6.34,s:"Breakfast & Snacks",cad:14},
+ {id:"coffee",wid:"1656225723",n:"Eight O'Clock coffee, 30 oz",q:1,p:20.12,s:"Beverages",cad:30},
+ {id:"cream",wid:"12166759",n:"Coffee creamer, 32 oz",q:1,p:3.48,s:"Beverages",cad:14},
+ {id:"pop",wid:"17619868",n:"A&W Zero root beer, 12 pk",q:1,p:7.28,s:"Beverages",cad:7,flex:1},
+ {id:"lemon",wid:"14869683",n:"Lemonade mix, 19 oz",q:1,p:3.97,s:"Beverages",cad:30,flex:1},
+ {id:"soy",wid:"15056122",n:"Soy sauce, 15 oz",q:1,p:1.76,s:"Backstock",cad:45,flex:1},
+ {id:"sesame",wid:"145525537",n:"Sesame oil, 8.45 oz",q:1,p:5.48,s:"Backstock",cad:60,flex:1},
+ {id:"ter",wid:"23598506",n:"Teriyaki sauce, 15 oz",q:1,p:3.02,s:"Backstock",cad:0,trig:["Teriyaki chicken + rice"]},
+ {id:"bbq",wid:"10294611",n:"Sweet Baby Ray's BBQ, 40 oz",q:1,p:3.82,s:"Backstock",cad:45,flex:1},
+ {id:"ench",wid:"24506160",n:"Enchilada sauce, 28 oz",q:1,p:3.97,s:"Backstock",cad:0,trig:["Chicken enchiladas"]},
+ {id:"alf",wid:"10291084",n:"Bertolli alfredo, 15 oz",q:1,p:2.98,s:"Backstock",cad:0,trig:["Chicken alfredo"]},
+ {id:"flour",wid:"122814298",n:"All-purpose flour, 10 lb",q:1,p:4.57,s:"Backstock",cad:30,flex:1},
+ {id:"bflour",wid:"453570042",n:"Bread flour, 5 lb",q:1,p:3.93,s:"Backstock",cad:30,flex:1},
+ {id:"oil",wid:"10316039",n:"Olive oil, 25.5 oz",q:1,p:9.12,s:"Backstock",cad:60,flex:1},
+ {id:"ranch",wid:"22282307",n:"Ranch dressing, 36 oz",q:1,p:3.82,s:"Backstock",cad:30,flex:1},
+ {id:"lime",wid:"10449044",n:"Lime juice",q:1,p:1.34,s:"Backstock",cad:30,flex:1},
+ {id:"chow",wid:"10292193",n:"Chow mein noodles, 5 oz",q:1,p:1.88,s:"Backstock",cad:0,trig:["Chicken chow mein"]},
+ {id:"queso",wid:"24908148",n:"Herdez queso blanco, 15 oz",q:1,p:3.76,s:"Backstock",cad:0,trig:["Baked nachos"]},
+ {id:"cofc",wid:"10314959",n:"Cream of chicken soup",q:2,p:0.74,s:"Backstock",cad:0,trig:["Chicken + rice casserole"]},
+ {id:"jal",wid:"10416458",n:"Jalapenos, jarred 12 oz",q:1,p:1.97,s:"Backstock",cad:45,flex:1},
+ {id:"syrup",wid:"10315918",n:"Sugar-free syrup, 24 oz",q:1,p:2.48,s:"Backstock",cad:45,flex:1},
+ {id:"tacosn",wid:"379517847",n:"Taco seasoning",q:3,p:0.47,s:"Backstock",cad:30,flex:1},
+ {id:"fajsn",wid:"149215159",n:"Fajita seasoning",q:2,p:0.67,s:"Backstock",cad:30,flex:1},
+ {id:"sjmix",wid:"10308900",n:"Sloppy joe mix",q:1,p:2.18,s:"Backstock",cad:0,trig:["Sloppy joes"]},
+ {id:"garlic",wid:"367014931",n:"Minced garlic, 8 oz",q:1,p:2.27,s:"Backstock",cad:45,flex:1},
+ {id:"tuna",wid:"33867594",n:"Canned tuna, 4 pk",q:1,p:3.84,s:"Backstock",cad:45,flex:1},
+ {id:"enood",wid:"10534093",n:"Egg noodles, 16 oz",q:1,p:1.74,s:"Backstock",cad:0,trig:["Chicken noodle soup"]},
+ {id:"coll",wid:"350254837",n:"Collagen peptides, 20 oz",q:1,p:31.97,s:"Health",cad:30,flex:1},
+ {id:"fiber",wid:"2304754548",n:"Equate daily fiber, 10 oz",q:1,p:8.98,s:"Health",cad:30,flex:1},
+ {id:"shakes",wid:"14893015",n:"Equate protein shakes, 12 ct",q:1,p:17.14,s:"Health",cad:14,flex:1},
+ {id:"ppowder",wid:"1334495884",n:"Whey protein powder",q:1,p:29.98,s:"Health",cad:45,flex:1},
+ {id:"ptowel",wid:"3945859864",n:"Paper towels, 12 double rolls",q:1,p:14.74,s:"Household",cad:30,flex:1},
+ {id:"tp",wid:"14977205703",n:"Toilet paper, 36 mega rolls",q:1,p:18.12,s:"Household",cad:45,flex:1},
+ {id:"tissue",wid:"19894669758",n:"Facial tissue, 72 pk",q:1,p:17.90,s:"Household",cad:60,flex:1},
+ {id:"dish",wid:"8877820478",n:"Finish Quantum pods, 62 ct",q:1,p:24.05,s:"Household",cad:60,flex:1},
+ {id:"tide",wid:"9659508154",n:"Tide Pods, 45 ct",q:1,p:19.94,s:"Household",cad:45,flex:1},
+ {id:"foil",wid:"121815660",n:"Aluminum foil, 75 sq ft",q:1,p:5.12,s:"Household",cad:60,flex:1},
+ {id:"parch",wid:"137567989",n:"Parchment paper, 50 sq ft",q:1,p:2.96,s:"Household",cad:60,flex:1},
+ {id:"fbag",wid:"624605773",n:"Freezer bags, gallon 80 ct",q:1,p:4.96,s:"Household",cad:60,flex:1},
+ {id:"sbag",wid:"2471694270",n:"Sandwich bags, 100 ct",q:1,p:2.28,s:"Household",cad:45,flex:1}
+];
+var D={
+"Taco bar":{db:"",mo:"",st:"5:30 PM",hd:"25 min"},
+"Chicken fajitas":{db:"Move diced chicken to fridge to thaw",mo:"Optional: toss chicken in fajita seasoning",st:"5:25 PM",hd:"30 min"},
+"Chicken enchiladas":{db:"Thaw chicken",mo:"Optional: cook and shred chicken ahead",st:"5:05 PM",hd:"30 min + 25 bake"},
+"Baked nachos":{db:"",mo:"",st:"5:30 PM",hd:"20 min + 10 bake"},
+"Spaghetti":{db:"",mo:"",st:"5:30 PM",hd:"25 min"},
+"Spaghetti + meatballs":{db:"Move frozen meatballs to the fridge",mo:"",st:"5:25 PM",hd:"20 min + 20 simmer"},
+"Baked penne":{db:"",mo:"",st:"5:10 PM",hd:"25 min + 25 bake"},
+"Chicken alfredo":{db:"Thaw diced chicken",mo:"",st:"5:25 PM",hd:"30 min"},
+"Homemade pizza":{db:"Feed the sourdough starter this evening",mo:"Mix dough in the morning, let it rise all day",st:"Start bake 5:20 PM",hd:"40 min"},
+"Smoked lasagna":{db:"Move frozen lasagna to the fridge; plan with Joshua",mo:"Start the smoker early afternoon",st:"Smoker on by 2:45 PM",hd:"15 min + 3 hr smoke"},
+"Chicken stir fry":{db:"Thaw diced chicken",mo:"Optional: chop veg ahead",st:"5:25 PM",hd:"30 min"},
+"Teriyaki chicken + rice":{db:"Thaw chicken; optional marinate in teriyaki overnight",mo:"",st:"5:25 PM",hd:"30 min"},
+"Chicken chow mein":{db:"Thaw chicken",mo:"",st:"5:25 PM",hd:"30 min"},
+"Potstickers + chicken fried rice":{db:"Thaw chicken; cook the rice tonight, day-old fries best",mo:"",st:"5:25 PM",hd:"30 min"},
+"Shrimp + chicken stir fry":{db:"Thaw shrimp and chicken",mo:"",st:"5:25 PM",hd:"30 min"},
+"Grilled burgers":{db:"",mo:"Optional: form patties",st:"5:30 PM",hd:"25 min"},
+"Grilled burgers + corn":{db:"",mo:"Optional: form patties",st:"5:30 PM",hd:"25 min"},
+"Grilled hot dogs / brats":{db:"",mo:"",st:"5:35 PM",hd:"20 min"},
+"Grilled brats + veg":{db:"",mo:"",st:"5:35 PM",hd:"20 min"},
+"Grilled BBQ chicken + corn":{db:"Thaw chicken",mo:"Optional: marinate in BBQ sauce",st:"5:25 PM",hd:"30 min"},
+"Grilled BBQ chicken":{db:"Thaw chicken",mo:"Optional: marinate in BBQ sauce",st:"5:25 PM",hd:"30 min"},
+"Grilled chicken + potatoes":{db:"Thaw chicken",mo:"Optional: marinate",st:"5:25 PM",hd:"30 min"},
+"Grilled pork chops + salad":{db:"",mo:"Optional: season or brine the chops",st:"5:30 PM",hd:"25 min"},
+"Baked pork chops + potatoes":{db:"",mo:"",st:"5:05 PM",hd:"20 min + 35 bake"},
+"Sausage + peppers":{db:"",mo:"",st:"5:25 PM",hd:"30 min"},
+"Sloppy joes":{db:"",mo:"",st:"5:30 PM",hd:"25 min"},
+"Breakfast for dinner":{db:"",mo:"",st:"5:25 PM",hd:"30 min"},
+"Slow cooker pot roast":{db:"Thaw the roast if frozen",mo:"Sear it, then load the crockpot by mid-morning, 8 hr low",st:"Crockpot on by 9:30 AM",hd:"20 min in the morning"},
+"Beef stew":{db:"Thaw the roast if frozen",mo:"Brown the cubes, then crockpot",st:"Crockpot on by 9:30 AM",hd:"25 min"},
+"Chili + cornbread":{db:"",mo:"Optional: brown the beef ahead",st:"5:00 PM",hd:"20 min + 40 simmer"},
+"Chicken tortilla soup":{db:"Thaw chicken",mo:"",st:"5:10 PM",hd:"25 min + 25 simmer"},
+"Chicken noodle soup":{db:"Thaw chicken",mo:"",st:"5:15 PM",hd:"20 min + 25 simmer"},
+"Chicken + rice casserole":{db:"Thaw chicken",mo:"",st:"5:00 PM",hd:"20 min + 55 bake"},
+"Chicken pot pie":{db:"Thaw chicken",mo:"",st:"5:05 PM",hd:"25 min + 25 bake"},
+"Meatloaf + mashed potatoes":{db:"",mo:"",st:"4:55 PM",hd:"20 min + 50 bake"},
+"Taco soup":{db:"",mo:"",st:"5:15 PM",hd:"15 min + 25 simmer"},
+"Nuggets + fries + veg":{db:"",mo:"",st:"5:30 PM",hd:"10 min + 20 bake"}
+};
+var RECIPE={
+"Taco bar":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"packet",n:"taco seasoning",g:"tacosn"},{a:2,u:"can",n:"refried beans",g:"refr"},{a:1,u:"box",n:"taco shells",g:"shells"},{a:8,u:"",n:"flour tortillas",g:"ftort"},{a:1,u:"bag",n:"tortilla chips",g:"chips"},{a:2,u:"cup",n:"fiesta shredded cheese",g:"fiesta"},{a:1,u:"cup",n:"salsa",g:"salsa"},{a:1,u:"cup",n:"sour cream",g:"sour"},{a:3,u:"cup",n:"shredded lettuce",g:"salad"},{a:2,u:"",n:"tomatoes, diced",g:"tom"},{a:2,u:"",n:"avocados, sliced",g:"avo"}],steps:["Brown the ground beef in a large skillet over medium high, breaking it up, 8 to 10 min. Drain the fat.","Stir in the taco seasoning and 1/2 cup water. Simmer 5 min until it thickens.","Warm the refried beans in a pot over low heat, stirring so they do not scorch.","Warm the taco shells and tortillas in the oven at 350 F for 5 min.","Set everything out in bowls. Everyone builds their own taco, burrito, nachos, or bowl."]},
+"Chicken fajitas":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:1,u:"packet",n:"fajita seasoning",g:"fajsn"},{a:3,u:"",n:"bell peppers, sliced",g:"bell"},{a:1,u:"",n:"yellow onion, sliced",g:"onion"},{a:12,u:"",n:"flour tortillas",g:"ftort"},{a:1,u:"cup",n:"sour cream",g:"sour"},{a:1,u:"cup",n:"fiesta shredded cheese",g:"fiesta"},{a:2,u:"cup",n:"rice",g:"rice"},{a:2,u:"tbsp",n:"lime juice",g:"lime"},{a:0.25,u:"cup",n:"cilantro, chopped",g:"cil"}],steps:["Thaw the chicken. Toss it with the fajita seasoning.","Start the rice. When it is done, stir in the lime juice, cilantro, and a good pinch of salt.","Heat oil in a large skillet over medium high. Cook the chicken 6 to 8 min until browned and cooked through.","Add the peppers and onion. Cook 5 more min. They should soften but keep some bite.","Warm the tortillas. Serve with sour cream, cheese, and the cilantro lime rice."]},
+"Chicken enchiladas":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:1,u:"jar",n:"enchilada sauce (28 oz)",g:"ench"},{a:12,u:"",n:"corn tortillas",g:"ctort"},{a:3,u:"cup",n:"fiesta shredded cheese",g:"fiesta"},{a:1,u:"cup",n:"sour cream",g:"sour"},{a:2,u:"cup",n:"rice",g:"rice"}],steps:["Thaw the chicken. Cook it through in a skillet, then shred it with two forks.","Mix the shredded chicken with the diced onion and 1 cup of the enchilada sauce.","Warm the tortillas so they roll without cracking. Fill each, roll, and place seam down in a 9x13 pan.","Pour the remaining sauce over the top. Cover with the cheese.","Bake at 375 F for 25 min until bubbling. Serve with rice and sour cream."]},
+"Baked nachos":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"packet",n:"taco seasoning",g:"tacosn"},{a:2,u:"can",n:"black beans, drained",g:"black"},{a:1,u:"bag",n:"tortilla chips",g:"chips"},{a:1,u:"jar",n:"queso",g:"queso"},{a:2,u:"cup",n:"fiesta shredded cheese",g:"fiesta"},{a:1,u:"cup",n:"salsa",g:"salsa"},{a:1,u:"cup",n:"sour cream",g:"sour"},{a:0.5,u:"cup",n:"jarred jalapenos",g:"jal"},{a:2,u:"",n:"tomatoes, diced",g:"tom"}],steps:["Brown the ground beef, drain, and stir in the taco seasoning with 1/2 cup water. Simmer 5 min.","Warm the black beans.","Spread the chips on two sheet pans. Layer on the beef, beans, and shredded cheese.","Bake at 400 F for 10 min until the cheese melts.","Drizzle with warmed queso. Top with salsa, sour cream, jalapenos, and tomato."]},
+"Spaghetti":{serves:6,ing:[{a:1,u:"lb",n:"spaghetti",g:"spag"},{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"jar",n:"pasta sauce",g:"marin"},{a:1,u:"can",n:"diced tomatoes",g:"rotel"},{a:0.5,u:"cup",n:"parmesan",g:"parm"},{a:1,u:"tbsp",n:"minced garlic",g:"garlic"},{a:6,u:"cup",n:"salad greens",g:"salad"}],steps:["Boil the spaghetti in well salted water until al dente.","Brown the ground beef in a large pot, drain the fat.","Add the garlic, pasta sauce, and diced tomatoes. Simmer 10 min.","Toss the drained pasta with the sauce. Top with parmesan.","Serve with a side salad."]},
+"Spaghetti + meatballs":{serves:6,ing:[{a:1,u:"lb",n:"spaghetti",g:"spag"},{a:24,u:"",n:"frozen meatballs",g:"mball"},{a:1,u:"jar",n:"pasta sauce",g:"marin"},{a:1,u:"loaf",n:"garlic bread",g:"gbread"},{a:0.5,u:"cup",n:"parmesan",g:"parm"},{a:6,u:"cup",n:"salad greens",g:"salad"}],steps:["Move the meatballs to the fridge the night before, or cook from frozen with 10 extra min.","Simmer the meatballs in the pasta sauce, covered, 20 min.","Boil the spaghetti in well salted water.","Bake the garlic bread per the package.","Serve the meatballs and sauce over the pasta with parmesan and a salad."]},
+"Baked penne":{serves:6,ing:[{a:1,u:"lb",n:"penne",g:"pasta"},{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"jar",n:"pasta sauce",g:"marin"},{a:1,u:"tub",n:"ricotta (15 oz)",g:"ric"},{a:2,u:"cup",n:"mozzarella",g:"mozz"},{a:3,u:"cup",n:"spinach",g:"spin"},{a:0.5,u:"cup",n:"parmesan",g:"parm"}],steps:["Boil the penne 2 min shy of al dente. It finishes cooking in the oven.","Brown the ground beef, drain, and add the pasta sauce. Stir in the spinach until it wilts.","Mix the pasta into the sauce.","Spread half in a 9x13, dollop the ricotta across it, then add the rest of the pasta.","Top with mozzarella and parmesan. Bake at 375 F for 25 min until bubbling and browned."]},
+"Chicken alfredo":{serves:6,ing:[{a:1,u:"lb",n:"pasta",g:"pasta"},{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:1,u:"jar",n:"alfredo sauce",g:"alf"},{a:0.5,u:"cup",n:"parmesan",g:"parm"},{a:4,u:"cup",n:"broccoli florets",g:"broc"},{a:0.5,u:"cup",n:"milk",g:"milk"}],steps:["Boil the pasta in salted water. Save 1 cup of the pasta water before draining.","Thaw and cook the chicken in a skillet over medium high until browned through, 8 min.","Steam the broccoli.","Add the alfredo sauce and the milk to the chicken. Warm through, do not boil it.","Toss with the pasta and broccoli. Loosen with pasta water if it is tight. Finish with parmesan."]},
+"Homemade pizza":{serves:6,ing:[{a:4,u:"cup",n:"bread flour",g:"bflour"},{a:1,u:"cup",n:"sourdough starter",g:"bflour"},{a:1,u:"jar",n:"pizza sauce",g:"pizsc"},{a:3,u:"cup",n:"mozzarella",g:"mozz"},{a:1,u:"bag",n:"pepperoni",g:"pep"},{a:1,u:"cup",n:"sliced mushrooms",g:"mush"},{a:1,u:"",n:"green bell pepper, sliced",g:"gbell"},{a:1,u:"can",n:"sliced black olives",g:"olive"}],steps:["The night before: feed the sourdough starter.","In the morning: mix the flour, starter, 1.5 cups water, and 2 tsp salt. Knead briefly and let it rise all day.","Preheat the oven as hot as it goes, 500 F, with the pan or stone inside for 30 min.","Divide the dough in two. Stretch each out on parchment.","Top with sauce, mozzarella, pepperoni, mushrooms, pepper, and olives.","Bake 10 to 12 min until the crust is browned and the cheese is bubbling."]},
+"Smoked lasagna":{serves:6,ing:[{a:1,u:"",n:"frozen lasagna (90 oz)",g:"lasg"},{a:1,u:"loaf",n:"garlic bread",g:"gbread"},{a:6,u:"cup",n:"salad greens",g:"salad"}],steps:["The night before: move the frozen lasagna to the fridge.","Early afternoon: Joshua starts the smoker, target 225 to 250 F.","Smoke the lasagna about 3 hours, until the center reads 165 F.","Rest 15 min before cutting or it will not hold its shape.","Bake the garlic bread. Serve with a big salad."]},
+"Chicken stir fry":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:4,u:"cup",n:"broccoli florets",g:"broc"},{a:2,u:"",n:"bell peppers, sliced",g:"bell"},{a:0.33,u:"cup",n:"soy sauce",g:"soy"},{a:2,u:"tbsp",n:"sesame oil",g:"sesame"},{a:1,u:"tbsp",n:"minced garlic",g:"garlic"},{a:2,u:"cup",n:"rice",g:"rice"}],steps:["Thaw the chicken. Start the rice.","Heat the sesame oil in a large skillet or wok until it shimmers.","Sear the chicken 6 to 8 min without crowding the pan, until browned through.","Add the broccoli and peppers. Stir fry 4 to 5 min. They should stay crisp.","Add the garlic and soy sauce. Toss for 1 min. Serve over rice."]},
+"Teriyaki chicken + rice":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:0.75,u:"cup",n:"teriyaki sauce",g:"ter"},{a:2,u:"cup",n:"rice",g:"rice"},{a:2,u:"cup",n:"sweet peas",g:"peas"},{a:3,u:"cup",n:"broccoli florets",g:"broc"}],steps:["Thaw the chicken. Optionally marinate it in half the teriyaki overnight.","Start the rice.","Cook the chicken in a hot skillet until browned and cooked through, 8 min.","Add the remaining teriyaki. Let it bubble and glaze the chicken, 3 to 4 min.","Steam the peas and broccoli. Serve over rice."]},
+"Chicken chow mein":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:1,u:"bag",n:"coleslaw mix",g:"slaw"},{a:2,u:"cup",n:"carrots, shredded",g:"carrot"},{a:0.33,u:"cup",n:"soy sauce",g:"soy"},{a:2,u:"tbsp",n:"sesame oil",g:"sesame"},{a:1,u:"tbsp",n:"minced garlic",g:"garlic"},{a:1,u:"can",n:"chow mein noodles",g:"chow"}],steps:["Thaw the chicken.","Heat the sesame oil and cook the chicken until browned through, 8 min.","Add the coleslaw mix and carrots. Stir fry 5 min until wilted but still bright.","Add the garlic and soy sauce. Toss 1 min.","Serve topped with the crunchy chow mein noodles."]},
+"Potstickers + chicken fried rice":{serves:6,ing:[{a:1,u:"bag",n:"chicken potstickers",g:"pstick"},{a:1,u:"lb",n:"diced chicken breast",g:"diced"},{a:4,u:"cup",n:"day-old cooked rice",g:"rice"},{a:3,u:"",n:"eggs",g:"eggs"},{a:1,u:"cup",n:"sweet peas",g:"peas"},{a:1,u:"cup",n:"carrots, diced",g:"carrot"},{a:0.33,u:"cup",n:"soy sauce",g:"soy"},{a:2,u:"tbsp",n:"sesame oil",g:"sesame"}],steps:["The night before: cook the rice and refrigerate it. Cold day-old rice fries best.","Thaw the chicken. Scramble the eggs in a skillet, then set them aside.","Heat the sesame oil. Cook the chicken through, then add the peas and carrots, 3 min.","Add the cold rice. Press it flat and let it sit a minute so it crisps before stirring.","Return the eggs, add the soy sauce, and toss everything together.","Cook the potstickers per the package and serve alongside."]},
+"Shrimp + chicken stir fry":{serves:6,ing:[{a:12,u:"oz",n:"frozen shrimp",g:"shrimp"},{a:1,u:"lb",n:"diced chicken breast",g:"diced"},{a:4,u:"cup",n:"broccoli florets",g:"broc"},{a:2,u:"cup",n:"sweet peas",g:"peas"},{a:0.33,u:"cup",n:"soy sauce",g:"soy"},{a:2,u:"tbsp",n:"sesame oil",g:"sesame"},{a:1,u:"tbsp",n:"minced garlic",g:"garlic"},{a:2,u:"cup",n:"rice",g:"rice"}],steps:["Thaw the shrimp and chicken. Pat the shrimp dry. Start the rice.","Cook the chicken first in hot sesame oil, 6 min, then set it aside.","Add the shrimp. They cook fast, 2 to 3 min until just pink. Do not overcook them or they turn rubbery.","Add the broccoli, peas, and garlic. Stir fry 4 min.","Return the chicken, add the soy sauce, toss, and serve over rice."]},
+"Grilled burgers":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:8,u:"",n:"hamburger buns",g:"hbun"},{a:8,u:"slice",n:"cheddar cheese",g:"slices"},{a:3,u:"cup",n:"shredded lettuce",g:"salad"},{a:2,u:"",n:"tomatoes, sliced",g:"tom"}],steps:["Form the beef into 6 to 8 patties. Press a dimple into the center of each so they do not dome up.","Season both sides generously with salt and pepper right before grilling.","Grill over medium high, 4 to 5 min per side. Flip once, do not press them.","Add the cheese in the last minute and close the lid to melt it.","Toast the buns on the grill. Serve with lettuce and tomato."]},
+"Grilled burgers + corn":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:8,u:"",n:"hamburger buns",g:"hbun"},{a:8,u:"slice",n:"cheddar cheese",g:"slices"},{a:6,u:"",n:"corn on the cob",g:"corn"},{a:3,u:"cup",n:"shredded lettuce",g:"salad"},{a:2,u:"",n:"tomatoes, sliced",g:"tom"}],steps:["Form the beef into 6 to 8 patties, dimple the centers, and season with salt and pepper.","Grill the corn, still in the husk or wrapped in foil with butter, about 15 min, turning.","Grill the patties over medium high, 4 to 5 min per side.","Add the cheese the last minute, lid closed.","Toast the buns. Serve with lettuce and tomato."]},
+"Grilled hot dogs / brats":{serves:6,ing:[{a:8,u:"",n:"hot dogs",g:"dogs"},{a:6,u:"",n:"brats",g:"brats"},{a:8,u:"",n:"hot dog buns",g:"dbun"},{a:6,u:"",n:"corn on the cob",g:"corn"}],steps:["Grill the brats over medium, turning, 12 to 15 min until browned and cooked through.","Add the hot dogs, they only need 6 to 8 min.","Grill the corn alongside, about 15 min.","Toast the buns on the grill the last minute.","Serve with your usual toppings."]},
+"Grilled brats + veg":{serves:6,ing:[{a:6,u:"",n:"brats",g:"brats"},{a:1,u:"",n:"kielbasa, sliced",g:"kielbasa"},{a:8,u:"",n:"hot dog buns",g:"dbun"},{a:2,u:"",n:"bell peppers, sliced",g:"bell"},{a:1,u:"",n:"yellow onion, sliced",g:"onion"}],steps:["Grill the brats over medium heat, turning, 12 to 15 min until cooked through.","Add the sliced kielbasa, it just needs to warm and char, 5 min.","Grill the peppers and onion in a foil packet with oil and salt, about 10 min.","Toast the buns. Serve the brats with the peppers and onions on top."]},
+"Grilled BBQ chicken + corn":{serves:6,ing:[{a:3,u:"lb",n:"chicken thighs",g:"thighs"},{a:1,u:"cup",n:"BBQ sauce",g:"bbq"},{a:6,u:"",n:"corn on the cob",g:"corn"},{a:6,u:"cup",n:"salad greens",g:"salad"}],steps:["Thaw the chicken. Season it well with salt and pepper.","Grill over medium, 6 to 7 min per side, until it reads 175 F for thighs.","Brush on the BBQ sauce only in the last 3 to 4 min. The sugar burns if you add it early.","Grill the corn alongside, about 15 min, turning.","Serve with a salad."]},
+"Grilled BBQ chicken":{serves:6,ing:[{a:3,u:"lb",n:"chicken thighs",g:"thighs"},{a:1,u:"cup",n:"BBQ sauce",g:"bbq"},{a:6,u:"cup",n:"salad greens",g:"salad"},{a:2,u:"lb",n:"potatoes",g:"pot"}],steps:["Thaw the chicken. Season well with salt and pepper.","Cut the potatoes into wedges, toss with oil and salt, roast at 425 F for 30 min.","Grill the chicken over medium, 6 to 7 min per side, to 175 F.","Brush on the BBQ sauce in the last 3 to 4 min only.","Serve with the potatoes and a salad."]},
+"Grilled chicken + potatoes":{serves:6,ing:[{a:3,u:"lb",n:"chicken thighs",g:"thighs"},{a:2,u:"tbsp",n:"Kinder's seasoning",g:"kinder"},{a:3,u:"lb",n:"potatoes",g:"pot"},{a:6,u:"cup",n:"salad greens",g:"salad"},{a:2,u:"tbsp",n:"olive oil",g:"oil"}],steps:["Thaw the chicken and season it all over with the Kinder's blend.","Cut the potatoes into wedges. Toss with olive oil and salt. Roast at 425 F for 30 to 35 min, flipping once.","Grill the chicken over medium, 6 to 7 min per side, to 175 F.","Rest the chicken 5 min. Serve with the potatoes and a salad."]},
+"Grilled pork chops + salad":{serves:6,ing:[{a:6,u:"",n:"pork loin chops",g:"chops"},{a:2,u:"tbsp",n:"Kinder's seasoning",g:"kinder"},{a:8,u:"cup",n:"salad greens",g:"salad"},{a:1,u:"cup",n:"ranch dressing",g:"ranch"},{a:2,u:"",n:"tomatoes",g:"tom"},{a:2,u:"",n:"cucumbers",g:"cuke"}],steps:["Season the chops in the morning if you can, it makes a real difference.","Bring them to room temp 20 min before grilling.","Grill over medium high, 4 to 5 min per side, until 145 F in the center.","Rest them 5 min before serving. This is what keeps them juicy.","Serve with a big salad, tomatoes, cucumbers, and ranch."]},
+"Baked pork chops + potatoes":{serves:6,ing:[{a:6,u:"",n:"pork loin chops",g:"chops"},{a:3,u:"lb",n:"potatoes",g:"pot"},{a:3,u:"cup",n:"green beans",g:"gbean"},{a:2,u:"tbsp",n:"olive oil",g:"oil"},{a:1,u:"tbsp",n:"Kinder's seasoning",g:"kinder"}],steps:["Cut the potatoes into wedges. Toss with olive oil and salt.","Spread on a sheet pan and roast at 425 F for 15 min.","Season the chops. Add them to the pan and roast 20 more min, until the chops hit 145 F.","Steam the green beans while it finishes.","Rest the chops 5 min before serving."]},
+"Sausage + peppers":{serves:6,ing:[{a:1,u:"lb",n:"Italian sausage",g:"isaus"},{a:1,u:"",n:"kielbasa, sliced",g:"kielbasa"},{a:3,u:"",n:"bell peppers, sliced",g:"bell"},{a:1,u:"",n:"yellow onion, sliced",g:"onion"},{a:1,u:"tbsp",n:"minced garlic",g:"garlic"},{a:2,u:"cup",n:"rice",g:"rice"}],steps:["Start the rice.","Brown the Italian sausage in a large skillet, breaking it up. Add the sliced kielbasa. Set both aside.","In the same pan, cook the peppers and onion 8 min until softened and browning at the edges.","Add the garlic, cook 1 min.","Return the sausage, toss it all together, and serve over rice."]},
+"Sloppy joes":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"packet",n:"sloppy joe mix",g:"sjmix"},{a:1,u:"can",n:"tomato sauce",g:"tsauce"},{a:8,u:"",n:"hamburger buns",g:"hbun"},{a:6,u:"cup",n:"salad greens",g:"salad"}],steps:["Brown the ground beef in a skillet, drain the fat.","Add the sloppy joe mix, the tomato sauce, and 1/2 cup water.","Simmer 10 min until it thickens.","Toast the buns.","Spoon it over the buns. Serve with a salad."]},
+"Breakfast for dinner":{serves:6,ing:[{a:12,u:"",n:"eggs",g:"eggs"},{a:1,u:"lb",n:"bacon",g:"bacon"},{a:1,u:"can",n:"biscuits",g:"bisc"},{a:4,u:"cup",n:"hash browns",g:"hash"},{a:0.5,u:"cup",n:"syrup",g:"syrup"},{a:2,u:"cup",n:"strawberries",g:"straw"}],steps:["Bake the biscuits per the package, 12 to 15 min at 375 F.","Cook the bacon on a sheet pan in the oven, 400 F for 15 min, so it stays flat and you are not babysitting a pan.","Crisp the hash browns in a skillet, 8 min, without stirring too much.","Scramble the eggs low and slow with butter, pulling them off while still slightly wet.","Serve with fruit and syrup."]},
+"Slow cooker pot roast":{serves:6,ing:[{a:3,u:"lb",n:"chuck roast",g:"roast"},{a:2,u:"cup",n:"beef broth",g:"bbroth"},{a:2,u:"lb",n:"potatoes, chunked",g:"pot"},{a:3,u:"cup",n:"carrots",g:"carrot"},{a:1,u:"",n:"yellow onion, quartered",g:"onion"},{a:1,u:"tbsp",n:"minced garlic",g:"garlic"}],steps:["Thaw the roast overnight if frozen. Pat it dry and salt it well.","Sear it hard on all sides in a hot skillet, 3 min a side. Do not skip this, it is where the flavor comes from.","Put the roast in the crockpot with the potatoes, carrots, onion, garlic, and beef broth.","Cook on low for 8 hours. Do not lift the lid, it adds 20 min every time.","Shred the meat and serve with the vegetables and broth spooned over."]},
+"Beef stew":{serves:6,ing:[{a:3,u:"lb",n:"chuck roast, cubed",g:"roast"},{a:3,u:"cup",n:"beef broth",g:"bbroth"},{a:3,u:"cup",n:"carrots",g:"carrot"},{a:2,u:"lb",n:"potatoes, chunked",g:"pot"},{a:3,u:"stalk",n:"celery",g:"celery"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:3,u:"tbsp",n:"flour",g:"flour"}],steps:["Cut the roast into 1 inch cubes. Pat them dry and salt them.","Toss the cubes in the flour. Brown them in batches in a hot pot, do not crowd the pan.","Add the onion and celery, cook 4 min.","Add the broth, carrots, and potatoes. Scrape the browned bits off the bottom.","Crockpot on low 8 hours, or simmer covered on the stove 2 to 3 hours until fork tender."]},
+"Chili + cornbread":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:2,u:"can",n:"chili beans",g:"chili"},{a:2,u:"can",n:"kidney beans",g:"kid"},{a:2,u:"can",n:"diced tomatoes",g:"rotel"},{a:2,u:"can",n:"tomato sauce",g:"tsauce"},{a:2,u:"box",n:"Jiffy corn muffin mix",g:"cbread"},{a:1,u:"cup",n:"sharp cheddar",g:"ched"},{a:0.5,u:"cup",n:"sour cream",g:"sour"}],steps:["Brown the ground beef with the diced onion, drain the fat.","Add the chili beans, kidney beans, diced tomatoes, and tomato sauce.","Season with chili powder, cumin, salt, and pepper. Simmer at least 40 min. Longer is better.","Make the cornbread per the box while it simmers.","Serve topped with cheddar and sour cream."]},
+"Chicken tortilla soup":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:4,u:"cup",n:"chicken broth",g:"cbroth"},{a:2,u:"can",n:"Rotel",g:"rotel"},{a:2,u:"can",n:"black beans, drained",g:"black"},{a:2,u:"cup",n:"frozen corn",g:"fcorn"},{a:1,u:"bag",n:"tortilla chips",g:"chips"},{a:2,u:"cup",n:"fiesta cheese",g:"fiesta"},{a:2,u:"",n:"avocados",g:"avo"},{a:2,u:"tbsp",n:"lime juice",g:"lime"},{a:0.25,u:"cup",n:"cilantro",g:"cil"}],steps:["Thaw the chicken. Cook it through in the pot, then shred it.","Add the chicken broth, Rotel, black beans, and corn.","Simmer 25 min so the flavors come together.","Finish with the lime juice and chopped cilantro. Taste for salt, soup always needs more than you think.","Serve topped with crushed chips, cheese, and avocado."]},
+"Chicken noodle soup":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:6,u:"cup",n:"chicken broth",g:"cbroth"},{a:12,u:"oz",n:"egg noodles",g:"enood"},{a:3,u:"cup",n:"carrots, sliced",g:"carrot"},{a:3,u:"stalk",n:"celery, sliced",g:"celery"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:2,u:"tbsp",n:"butter",g:"butter"}],steps:["Thaw and dice the chicken.","Melt the butter in a large pot. Cook the onion, carrots, and celery 6 min until softened.","Add the chicken broth and the chicken. Simmer 20 min.","Add the egg noodles and cook 8 more min until tender.","Season well with salt and pepper. Soup needs more salt than you expect."]},
+"Chicken + rice casserole":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:2,u:"cup",n:"rice, uncooked",g:"rice"},{a:2,u:"can",n:"cream of chicken soup",g:"cofc"},{a:3,u:"cup",n:"chicken broth",g:"cbroth"},{a:2,u:"cup",n:"sharp cheddar",g:"ched"},{a:3,u:"cup",n:"broccoli florets",g:"broc"}],steps:["Thaw and dice the chicken.","In a 9x13, stir together the uncooked rice, the cream of chicken soup, and the broth.","Lay the chicken on top and season it. Cover the pan tightly with foil.","Bake at 375 F for 45 min.","Uncover, scatter on the broccoli and cheddar, and bake 10 more min until melted."]},
+"Chicken pot pie":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:1,u:"can",n:"biscuits",g:"bisc"},{a:4,u:"tbsp",n:"butter",g:"butter"},{a:0.33,u:"cup",n:"flour",g:"flour"},{a:3,u:"cup",n:"chicken broth",g:"cbroth"},{a:1,u:"cup",n:"milk",g:"milk"},{a:2,u:"cup",n:"sweet peas",g:"peas"},{a:2,u:"cup",n:"carrots, diced",g:"carrot"},{a:3,u:"stalk",n:"celery, diced",g:"celery"}],steps:["Thaw the chicken and cook it through in a skillet. Set it aside.","Melt the butter in a large pot. Cook the carrots, celery, and onion 6 min.","Stir in the flour and cook 1 min. This is the roux that thickens everything.","Whisk in the broth and milk. Simmer until it thickens, 5 min.","Stir in the chicken and peas. Pour into a 9x13 and top with the biscuits.","Bake at 375 F for 25 min until the biscuits are golden and cooked through."]},
+"Meatloaf + mashed potatoes":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"cup",n:"bread crumbs",g:"bcrumb"},{a:2,u:"",n:"eggs",g:"eggs"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:0.5,u:"cup",n:"ketchup",g:"ketch"},{a:3,u:"lb",n:"potatoes",g:"pot"},{a:4,u:"tbsp",n:"butter",g:"butter"},{a:0.5,u:"cup",n:"milk",g:"milk"},{a:3,u:"cup",n:"green beans",g:"gbean"}],steps:["Mix the beef, bread crumbs, eggs, diced onion, salt, and pepper. Do not overwork it or it turns dense.","Shape into a loaf on a sheet pan. Spread the ketchup over the top.","Bake at 375 F for 50 min, until the center reads 160 F.","Boil the potatoes 20 min until fork tender. Mash with the butter and milk.","Steam the green beans.","Rest the meatloaf 10 min before slicing or it falls apart."]},
+"Taco soup":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:1,u:"packet",n:"taco seasoning",g:"tacosn"},{a:4,u:"cup",n:"chicken broth",g:"cbroth"},{a:2,u:"can",n:"Rotel",g:"rotel"},{a:2,u:"can",n:"black beans",g:"black"},{a:2,u:"can",n:"kidney beans",g:"kid"},{a:2,u:"cup",n:"frozen corn",g:"fcorn"},{a:1,u:"bag",n:"tortilla chips",g:"chips"},{a:2,u:"cup",n:"fiesta cheese",g:"fiesta"},{a:1,u:"cup",n:"sour cream",g:"sour"}],steps:["Brown the ground beef with the onion, drain the fat.","Add the taco seasoning, broth, Rotel, both cans of beans, and the corn.","Simmer 25 min.","Serve with chips, cheese, and sour cream on top. This one is very forgiving."]},
+"Nuggets + fries + veg":{serves:6,ing:[{a:32,u:"oz",n:"chicken nuggets",g:"nugg"},{a:32,u:"oz",n:"frozen fries",g:"fries"},{a:4,u:"cup",n:"broccoli florets",g:"broc"},{a:0.5,u:"cup",n:"ranch dressing",g:"ranch"}],steps:["Heat the oven to 425 F.","Spread the nuggets and fries on two separate sheet pans so nothing steams.","Bake about 20 min, flipping halfway.","Steam the broccoli.","Serve with ranch. Easy night, no guilt."]}
+};
+var STRETCH={
+"Taco bar":{how:"Easiest meal to stretch. Cook a pot of rice and open extra beans, both are already on your list. Put out more tortillas and chips.",need:"Rice, beans, more tortillas"},
+"Chicken fajitas":{how:"Cook rice and set out beans. Slice an extra pepper and onion so the pan looks full. More tortillas.",need:"Rice, beans, extra peppers"},
+"Chicken enchiladas":{how:"Make a second smaller pan, stretching the chicken with a can of black beans mixed in. Serve rice on the side.",need:"Black beans, rice"},
+"Baked nachos":{how:"Use a second sheet pan. Bulk the beef with a can of beans. Add more chips and cheese.",need:"Beans, chips, cheese"},
+"Spaghetti":{how:"Boil a second box of pasta and stretch the sauce with a can of diced tomatoes. Garlic bread and a big salad fill the table.",need:"Pasta, canned tomatoes, salad"},
+"Spaghetti + meatballs":{how:"Boil more pasta and add a can of diced tomatoes to the sauce. Garlic bread and salad.",need:"Pasta, canned tomatoes"},
+"Baked penne":{how:"Use a bigger pan or a second one. Stretch the sauce with canned tomatoes and add extra spinach. Serve with garlic bread.",need:"Pasta, canned tomatoes, spinach"},
+"Chicken alfredo":{how:"Boil more pasta and thin the alfredo with a splash of milk and pasta water so it still coats. Add extra broccoli.",need:"Pasta, milk, broccoli"},
+"Homemade pizza":{how:"Make an extra dough ball in the morning if you know ahead. If not, stretch the dough thinner and make a big salad.",need:"Extra dough, salad"},
+"Smoked lasagna":{how:"A 90 oz lasagna already feeds a crowd. Add a big salad and extra garlic bread and you are fine.",need:"Salad, garlic bread"},
+"Chicken stir fry":{how:"Cook more rice, that is the main stretcher. Add extra frozen broccoli and peppers so the pan is generous.",need:"Rice, frozen veg"},
+"Teriyaki chicken + rice":{how:"Double the rice and add extra broccoli and peas. Scramble an egg into the rice if you need more.",need:"Rice, frozen veg, eggs"},
+"Chicken chow mein":{how:"Add more coleslaw mix and carrots, they bulk it fast. Serve rice alongside.",need:"Coleslaw mix, rice"},
+"Potstickers + chicken fried rice":{how:"Cook more rice and scramble in two extra eggs. Add peas and carrots. Cook the whole bag of potstickers.",need:"Rice, eggs, frozen veg"},
+"Shrimp + chicken stir fry":{how:"Lean on the chicken and rice rather than the shrimp. Extra frozen veg. Shrimp is the expensive part, do not stretch it.",need:"Rice, chicken, frozen veg"},
+"Grilled burgers":{how:"Make the patties smaller and add a hot dog or two. Chips, salad, and corn fill plates.",need:"Smaller patties, sides"},
+"Grilled burgers + corn":{how:"Thinner patties, more corn, big salad. Add brats to the grill if you have them.",need:"Corn, salad, brats"},
+"Grilled hot dogs / brats":{how:"Grill everything you have and add corn and chips. This one scales easily.",need:"Corn, chips, buns"},
+"Grilled brats + veg":{how:"Add hot dogs to the grill and put out chips and a salad.",need:"Hot dogs, sides"},
+"Grilled BBQ chicken + corn":{how:"Add the chicken thighs from the freezer if thawed, or grill brats alongside. More corn and a salad.",need:"Extra chicken, corn, salad"},
+"Grilled BBQ chicken":{how:"Grill brats alongside. Roast potatoes and add a big salad.",need:"Brats, potatoes, salad"},
+"Grilled chicken + potatoes":{how:"Roast more potatoes, they are cheap and filling. Grill brats too if you need more protein.",need:"Potatoes, brats"},
+"Grilled pork chops + salad":{how:"Chops do not stretch, so add another protein on the grill (brats) and roast potatoes.",need:"Brats, potatoes"},
+"Baked pork chops + potatoes":{how:"Roast more potatoes and add extra green beans. If you need more protein, bake chicken thighs alongside.",need:"Potatoes, green beans"},
+"Sausage + peppers":{how:"Add the kielbasa from the fridge, slice more peppers and onion, and serve over rice instead of rolls.",need:"Kielbasa, rice, peppers"},
+"Sloppy joes":{how:"Stretch the beef with a can of beans or extra tomato sauce. More buns, plus chips and salad.",need:"Beans, tomato sauce, buns"},
+"Breakfast for dinner":{how:"Scramble more eggs, that is the cheapest stretcher you have. Extra hash browns and biscuits.",need:"Eggs, hash browns, biscuits"},
+"Slow cooker pot roast":{how:"Add more carrots and potatoes to the crockpot, they soak up the broth and go far. Add a salad and bread.",need:"Carrots, potatoes, bread"},
+"Beef stew":{how:"Add more potatoes, carrots, and celery, plus another carton of broth. Serve over egg noodles to stretch further.",need:"Potatoes, broth, egg noodles"},
+"Chili + cornbread":{how:"Add another can of beans and a can of tomato sauce. Double the cornbread. Chili stretches better than almost anything.",need:"Beans, tomato sauce, cornbread"},
+"Chicken tortilla soup":{how:"Add a carton of broth, another can of beans, and more corn. Put out extra chips, cheese, and avocado.",need:"Broth, beans, corn, chips"},
+"Chicken noodle soup":{how:"Add broth and more egg noodles. Extra carrots and celery. Serve with bread.",need:"Broth, egg noodles, bread"},
+"Chicken + rice casserole":{how:"Use a bigger pan, add more rice and an extra can of cream of chicken plus broth. Add broccoli.",need:"Rice, cream of chicken, broth"},
+"Chicken pot pie":{how:"Make it in a bigger pan, add more peas, carrots, and potatoes to the filling, and top with more biscuits.",need:"Veg, biscuits"},
+"Meatloaf + mashed potatoes":{how:"Stretch the loaf with extra breadcrumbs and an egg. Mash more potatoes, and add green beans.",need:"Breadcrumbs, potatoes, green beans"},
+"Taco soup":{how:"Add broth, another can of beans, and more corn. Chips and cheese on top. Very forgiving.",need:"Broth, beans, corn"},
+"Nuggets + fries + veg":{how:"Bake the whole bag of nuggets and a second bag of fries. Add a salad.",need:"Nuggets, fries, salad"}
+};
+var CILANTRO=["Chicken fajitas", "Chicken enchiladas", "Taco bar", "Baked nachos", "Chicken tortilla soup", "Taco soup"];
+var FUN={5:1,6:1};
+var BATCH=[{id:"b1",n:"Eggs, extra 18 ct",q:1,p:2.17},{id:"b2",n:"Breakfast sausage roll",q:1,p:2.94},
+ {id:"b3",n:"Burrito tortillas, extra",q:2,p:2.68},{id:"b4",n:"Hash browns, extra",q:1,p:3.42},
+ {id:"b5",n:"Shredded cheese, extra",q:1,p:6.92},{id:"b6",n:"Beans, extra cans",q:4,p:0.86}];
+var SECORDER=["Protein","Dairy","Produce","Frozen","Pantry","Bread","Breakfast & Snacks","Beverages","Backstock","Health","Household","Batch day"];
+var DEFAULT_BUDGET=375;   // honest run rate ($335 tracked + ~$30 untracked household + slack)
+function getBudget(){var v=parseFloat(LS("mealBudget",""));return (v&&v>0)?v:DEFAULT_BUDGET;}
+function setBudget(v){SS("mealBudget",String(v));}
+function LS(k,d){try{var v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}}
+function SS(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+var bought=(function(){try{return JSON.parse(LS("mealBought","{}"))||{};}catch(e){return {};}})();
+var lastBatch=LS("mealBatch","");
+function strip(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function iso(d){var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd;}
+function fromIso(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
+function dbet(a,b){return Math.round((strip(b)-strip(a))/86400000);}
+function seasonOf(d){var m=d.getMonth();if(m>=5&&m<=7)return "summer";if(m>=8&&m<=10)return "fall";if(m===11||m<=1)return "winter";return "spring";}
+function planFor(d){var s=seasonOf(d);return s==="fall"?FALL:s==="winter"?WINTER:s==="spring"?SPRING:SUMMER;}
+function baseMeal(d){var i=dbet(ANCHOR,d);var m=((i%28)+28)%28;return planFor(d)[Math.floor(m/7)][m%7];}
+function mealFor(d){var k=iso(d);if(swaps[k])return swaps[k];return baseMeal(d);}
+var DAYN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+var DAYA=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+var CHK='<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+var today=strip(new Date());
+function money(n){return "$"+n.toFixed(2);}
+
+
+
+
+
+// ---------- recipe scaling ----------
+function fmtAmt(n){
+ if(n>=10) return String(Math.round(n));
+ var whole=Math.floor(n), frac=n-whole;
+ var f="";
+ if(frac>0.80){whole+=1;frac=0;}
+ else if(frac>0.70) f="3/4";
+ else if(frac>0.58) f="2/3";
+ else if(frac>0.42) f="1/2";
+ else if(frac>0.29) f="1/3";
+ else if(frac>0.17) f="1/4";
+ else if(frac>0.08) f="1/8";
+ if(whole===0 && !f) return n.toFixed(1);
+ if(!f) return String(whole);
+ return whole? whole+" "+f : f;
+}
+function scaleLine(x,factor){
+ var a=x.a*factor;
+ var amt=fmtAmt(a);
+ var u=x.u?(" "+x.u):"";
+ return amt+u+"  "+x.n;
+}
+
+// ---------- meal ratings ----------
+var ratings=(function(){try{return JSON.parse(LS("mealRatings","{}"))||{};}catch(e){return {};}})();
+function rate(meal,v){
+ if(ratings[meal]===v) delete ratings[meal]; else ratings[meal]=v;
+ SS("mealRatings",JSON.stringify(ratings));
+}
+
+// ---------- order history ----------
+var history=(function(){try{return JSON.parse(LS("mealHistory","[]"))||[];}catch(e){return [];}})();
+function logOrder(total,days){
+ history.push({d:iso(strip(new Date())),t:Math.round(total*100)/100,days:days});
+ if(history.length>60) history=history.slice(-60);
+ SS("mealHistory",JSON.stringify(history));
+}
+function weeklyAvg(){
+ if(!history.length) return null;
+ var recent=history.slice(-8);
+ var sum=recent.reduce(function(a,o){return a+o.t*(7/o.days);},0);
+ return sum/recent.length;
+}
+
+// ---------- meal swap ----------
+// A meal is "available" if every trigger ingredient it needs was bought recently enough
+// to still be on hand. Frozen and pantry keep longer than fresh.
+var SHELF={Frozen:35,Pantry:60,Backstock:60,Dairy:14,Produce:8,Protein:10,Bread:10};
+var swaps=(function(){try{return JSON.parse(LS("mealSwaps","{}"))||{};}catch(e){return {};}})();
+
+function triggersFor(meal){
+ return G.filter(function(g){return g.trig && g.trig.indexOf(meal)>=0;});
+}
+function onHand(g,d){
+ var last=bought[g.id];
+ if(!last)return false;
+ var age=dbet(fromIso(last),d);
+ var shelf=SHELF[g.s]||21;
+ return age<=shelf;
+}
+function mealAvailable(meal,d){
+ var t=triggersFor(meal);
+ for(var i=0;i<t.length;i++){ if(!onHand(t[i],d))return false; }
+ return true;
+}
+function allMeals(){
+ var s=[];
+ [SUMMER,FALL,WINTER,SPRING].forEach(function(P){
+  P.forEach(function(w){w.forEach(function(m){if(s.indexOf(m)<0)s.push(m);});});
+ });
+ return s;
+}
+function minutesOf(meal){
+ var h=(D[meal]||{}).hd||"";
+ var m=/(\d+)/.exec(h);
+ return m?parseInt(m[1],10):30;
+}
+function swapCandidates(d,current){
+ var season=seasonOf(d);
+ var out=allMeals().filter(function(m){
+  if(m===current)return false;
+  if(!mealAvailable(m,d))return false;
+  // no lasagna unless it's a Saturday, it needs the smoker and Joshua
+  if(m==="Smoked lasagna" && d.getDay()!==6)return false;
+  // crockpot meals need a morning start, not a same-day rescue
+  if(/pot roast|Beef stew/i.test(m))return false;
+  // pizza needs dough started in the morning
+  if(m==="Homemade pizza")return false;
+  return true;
+ });
+ out.sort(function(a,b){return minutesOf(a)-minutesOf(b);});
+ return out;
+}
+
+function viewTonight(){
+ var el=document.getElementById("v-tonight");el.innerHTML="";
+ var meal=mealFor(today);var info=D[meal]||{};
+ var tom=new Date(today);tom.setDate(tom.getDate()+1);
+ var tmeal=mealFor(tom);var tinfo=D[tmeal]||{};
+ var c=document.createElement("div");c.className="card";
+ c.innerHTML='<div class="label">Tonight&rsquo;s dinner</div><div class="meal">'+meal+'</div>';
+ var meta=document.createElement("div");meta.className="meta";var h="";
+ if(info.st)h+='<span class="chip time"><b>Start by '+info.st+'</b></span>';
+ if(info.hd)h+='<span class="chip">Hands on: <b>'+info.hd+'</b></span>';
+ var dow=today.getDay();
+ h+='<span class="chip">'+(dow===1||dow===3||dow===4?"School day: pack lunches":"Home day: leftovers for lunch")+'</span>';
+ if(FUN[dow])h+='<span class="chip">Fun night</span>';
+ meta.innerHTML=h;c.appendChild(meta);
+ if(info.mo){var m=document.createElement("div");m.className="noteline";m.innerHTML='<b>Morning of</b>'+info.mo;c.appendChild(m);}
+ if(CILANTRO.indexOf(meal)>=0){var cl=document.createElement("div");cl.className="noteline";cl.innerHTML='<b>Rice</b>Cook the bulk rice, then stir in lime juice, chopped cilantro, and salt.';c.appendChild(cl);}
+ var rx=RECIPE[meal];
+ if(rx){
+  var servings=6;
+  var det=document.createElement("details");det.className="intro";det.style.marginTop="16px";
+  var sm=document.createElement("summary");
+  sm.style.cssText="list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;font-family:Fraunces,serif;font-weight:600;font-size:17px;color:var(--green);";
+  sm.innerHTML='<span>Recipe</span><span style="color:var(--terra)">&#9662;</span>';
+  det.appendChild(sm);
+  var body=document.createElement("div");body.style.padding="0 18px 18px";
+  det.appendChild(body);
+
+  function drawRecipe(){
+   body.innerHTML="";
+   var factor=servings/rx.serves;
+   // serving stepper
+   var sv=document.createElement("div");
+   sv.style.cssText="display:flex;align-items:center;gap:10px;padding:12px 0 14px;border-bottom:1px solid var(--rule-soft);margin-bottom:14px;";
+   var minus=document.createElement("button");minus.className="tbtn";minus.textContent="\u2212";
+   minus.style.cssText="border-color:var(--rule);color:var(--green);font-size:16px;padding:4px 12px;";
+   var cnt=document.createElement("span");
+   cnt.style.cssText="font-family:Fraunces,serif;font-weight:600;font-size:17px;min-width:92px;text-align:center;";
+   cnt.textContent=servings+" servings";
+   var plus=document.createElement("button");plus.className="tbtn";plus.textContent="+";
+   plus.style.cssText="border-color:var(--rule);color:var(--green);font-size:16px;padding:4px 12px;";
+   minus.addEventListener("click",function(e){e.preventDefault();if(servings>2){servings-=1;drawRecipe();}});
+   plus.addEventListener("click",function(e){e.preventDefault();if(servings<20){servings+=1;drawRecipe();}});
+   sv.appendChild(minus);sv.appendChild(cnt);sv.appendChild(plus);
+   if(servings!==6){
+    var rs=document.createElement("span");rs.style.cssText="font-size:12px;color:var(--terra);cursor:pointer;text-decoration:underline;";
+    rs.textContent="reset to 6";
+    rs.addEventListener("click",function(){servings=6;drawRecipe();});
+    sv.appendChild(rs);
+   }
+   body.appendChild(sv);
+
+   var ih=document.createElement("div");
+   ih.style.cssText="font-family:Fraunces,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:8px;";
+   ih.textContent="You need";
+   body.appendChild(ih);
+   var ul=document.createElement("div");ul.style.marginBottom="18px";
+   rx.ing.forEach(function(x){
+    var li=document.createElement("div");
+    li.style.cssText="display:flex;gap:10px;padding:5px 0;font-size:15px;border-bottom:1px solid var(--rule-soft);";
+    var a=document.createElement("span");
+    a.style.cssText="font-weight:600;min-width:80px;color:var(--green);";
+    a.textContent=fmtAmt(x.a*factor)+(x.u?" "+x.u:"");
+    var nn=document.createElement("span");nn.textContent=x.n;
+    li.appendChild(a);li.appendChild(nn);ul.appendChild(li);
+   });
+   body.appendChild(ul);
+
+   var sh=document.createElement("div");
+   sh.style.cssText="font-family:Fraunces,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:8px;";
+   sh.textContent="Steps";
+   body.appendChild(sh);
+   var ol=document.createElement("ol");
+   ol.style.cssText="margin:0;padding-left:20px;font-size:15px;line-height:1.6;";
+   rx.steps.forEach(function(s){var li=document.createElement("li");li.textContent=s;li.style.marginBottom="8px";ol.appendChild(li);});
+   body.appendChild(ol);
+
+   if(servings>6){
+    var st=STRETCH[meal];
+    if(st){
+     var sn=document.createElement("div");sn.className="noteline warn";sn.style.marginTop="14px";
+     sn.innerHTML='<b>Stretching it</b>'+st.how;
+     body.appendChild(sn);
+    }
+   }
+  }
+  drawRecipe();
+  c.appendChild(det);
+ }
+ // feeding more
+ var gs=document.createElement("div");gs.style.marginTop="16px";
+ var grow=document.createElement("div");grow.style.display="flex";grow.style.alignItems="center";
+ grow.style.gap="8px";grow.style.flexWrap="wrap";
+ var glab=document.createElement("span");glab.style.fontSize="13.5px";glab.style.color="var(--muted)";
+ glab.textContent="Feeding more tonight?";
+ grow.appendChild(glab);
+ var gpanel=document.createElement("div");gpanel.style.display="none";
+ [2,4,6].forEach(function(extra){
+  var gb=document.createElement("button");gb.className="tbtn";
+  gb.style.borderColor="var(--rule)";gb.style.color="var(--terra)";
+  gb.textContent="+"+extra;
+  gb.addEventListener("click",function(){
+   var total=6+extra;
+   var factor=total/6;
+   var st=STRETCH[meal]||{how:"Add rice, beans, bread, or a big salad. Those stretch anything.",need:"Rice, beans, salad"};
+   gpanel.style.display="block";gpanel.innerHTML="";
+   var head=document.createElement("div");head.className="noteline warn";
+   head.innerHTML='<b>Cooking for '+total+'</b>Scale the protein by about '+factor.toFixed(1)+'x. Rule of thumb: a third of a pound of meat per adult.';
+   gpanel.appendChild(head);
+   var howd=document.createElement("div");howd.className="noteline";
+   howd.innerHTML='<b>How to stretch '+meal+'</b>'+st.how;
+   gpanel.appendChild(howd);
+   var needd=document.createElement("div");needd.className="noteline";
+   needd.innerHTML='<b>Lean on</b>'+st.need;
+   gpanel.appendChild(needd);
+   var note=document.createElement("div");note.className="foot";
+   note.innerHTML="This does not touch your shopping list or budget. Hosting comes out of your weekly buffer.";
+   gpanel.appendChild(note);
+  });
+  grow.appendChild(gb);
+ });
+ gs.appendChild(grow);gs.appendChild(gpanel);
+ c.appendChild(gs);
+
+ // rating
+ var rt=document.createElement("div");rt.style.marginTop="16px";
+ rt.style.display="flex";rt.style.alignItems="center";rt.style.gap="10px";
+ var rlab=document.createElement("span");rlab.style.fontSize="13.5px";rlab.style.color="var(--muted)";
+ rlab.textContent="How did it go?";
+ rt.appendChild(rlab);
+ [["hit","Hit"],["miss","Miss"]].forEach(function(pair){
+  var bb=document.createElement("button");
+  bb.className="tbtn";
+  bb.style.borderColor=ratings[meal]===pair[0]?"var(--green)":"var(--rule)";
+  bb.style.color=ratings[meal]===pair[0]?"#fff":"var(--muted)";
+  bb.style.background=ratings[meal]===pair[0]?"var(--green)":"transparent";
+  bb.textContent=pair[1];
+  bb.addEventListener("click",function(){rate(meal,pair[0]);viewTonight();});
+  rt.appendChild(bb);
+ });
+ c.appendChild(rt);
+
+ // swap control
+ var sw=document.createElement("div");sw.style.marginTop="16px";
+ var swBtn=document.createElement("button");swBtn.className="btn";
+ swBtn.style.background="transparent";swBtn.style.color="var(--green)";
+ swBtn.style.border="1px solid var(--rule)";swBtn.style.width="100%";
+ var isSwapped=!!swaps[iso(today)];
+ swBtn.textContent=isSwapped?"Swapped. Put "+baseMeal(today)+" back":"Not tonight? Swap this meal";
+ sw.appendChild(swBtn);
+ var panel=document.createElement("div");panel.style.display="none";sw.appendChild(panel);
+ swBtn.addEventListener("click",function(){
+  if(swaps[iso(today)]){ delete swaps[iso(today)]; SS("mealSwaps",JSON.stringify(swaps)); viewTonight(); viewWeek(); return; }
+  if(panel.style.display==="block"){panel.style.display="none";return;}
+  panel.style.display="block";panel.innerHTML="";
+  var cands=swapCandidates(today,meal);
+  var h=document.createElement("div");h.className="noteline";
+  h.innerHTML='<b>You already have what these need</b>Picked from what you actually bought. Fastest first.';
+  panel.appendChild(h);
+  if(!cands.length){
+   var e=document.createElement("div");e.className="noteline warn";
+   e.innerHTML='<b>Nothing swappable</b>Log an order on the Shop tab first, so the app knows what is in your kitchen.';
+   panel.appendChild(e);return;
+  }
+  cands.slice(0,8).forEach(function(m){
+   var row=document.createElement("div");row.className="item";row.style.cursor="pointer";
+   var body=document.createElement("div");body.className="i-body";
+   body.innerHTML='<div class="i-name">'+m+'</div><div class="i-why">'+((D[m]||{}).hd||"")+'</div>';
+   var rt=document.createElement("div");rt.className="i-right";
+   rt.innerHTML='<div class="i-qty">'+((D[m]||{}).st||"")+'</div>';
+   row.appendChild(body);row.appendChild(rt);
+   row.addEventListener("click",function(){
+    swaps[iso(today)]=m; SS("mealSwaps",JSON.stringify(swaps));
+    viewTonight(); viewWeek(); window.scrollTo({top:0,behavior:"smooth"});
+   });
+   panel.appendChild(row);
+  });
+  var note=document.createElement("div");note.className="foot";
+  note.innerHTML="The skipped meal is not lost. It comes back around on the next 28 day cycle.";
+  panel.appendChild(note);
+ });
+ c.appendChild(sw);
+ el.appendChild(c);
+ var t=document.createElement("div");t.className="card";
+ t.innerHTML='<div class="label">Tomorrow</div><div style="font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:2px 0 6px;">'+tmeal+'</div>';
+ var w=document.createElement("div");
+ if(tinfo.db){w.className="noteline warn";w.innerHTML='<b>Do this tonight</b>'+tinfo.db;}
+ else{w.className="noteline";w.innerHTML='<b>Do this tonight</b>Nothing to prep. Enjoy your evening.';}
+ t.appendChild(w);el.appendChild(t);
+}
+function dueInfo(it,sd){
+ if(it.cad===0)return null;
+ var last=bought[it.id];
+ if(!last)return {due:true,txt:"not logged yet"};
+ var d=dbet(fromIso(last),sd);
+ if(d>=it.cad)return {due:true,txt:d+" days since last"};
+ return {due:false,txt:""};
+}
+function buildList(sd,days){
+ var meals=[],uniq=[];
+ for(var i=0;i<days;i++){var d=new Date(sd);d.setDate(d.getDate()+i);var m=mealFor(d);meals.push(m);if(uniq.indexOf(m)<0)uniq.push(m);}
+ var season=seasonOf(sd);
+ var out=[];
+ G.forEach(function(it){
+  if(it.sn&&it.sn!==season)return;
+  if(it.trig){
+   var hits=it.trig.filter(function(m){return uniq.indexOf(m)>=0;});
+   if(!hits.length)return;
+   if(it.cad>0){var di=dueInfo(it,sd);if(!di||!di.due)return;}
+   out.push({it:it,why:"for "+hits[0],q:it.q});return;
+  }
+  var di=dueInfo(it,sd);
+  if(di&&di.due)out.push({it:it,why:di.txt,q:it.q});
+ });
+ var chick=meals.filter(function(m){return /chicken|fajita|teriyaki|enchilada|alfredo|chow mein|stir fry|potsticker|nugget/i.test(m);}).length;
+ if(chick>=4)out.push({it:{id:"diced3",wid:"621164712",n:"Diced chicken, extra bag",q:1,p:7.94,s:"Protein"},why:"heavy chicken stretch ("+chick+" meals)",q:1});
+ var pepd=meals.filter(function(m){return /fajita|stir fry|pizza|sausage \+ peppers/i.test(m);}).length;
+ if(pepd>=3)out.push({it:{id:"bell2",wid:"47770124",n:"Bell peppers, 2nd 3-pack",q:1,p:2.97,s:"Produce"},why:"pepper-heavy stretch ("+pepd+" meals)",q:1});
+ if(uniq.indexOf("Sausage + peppers")>=0)out.push({it:{id:"isaus2",wid:"40711369",n:"Italian sausage, 2nd pack",q:1,p:3.92,s:"Protein"},why:"for Sausage + peppers",q:1});
+ var bd=lastBatch?dbet(fromIso(lastBatch),sd):999;
+ var batchDue=(bd>=28);
+ if(batchDue)BATCH.forEach(function(b){out.push({it:{id:b.id,n:b.n,q:b.q,p:b.p,s:"Batch day",flex:1},why:"freezer batch add-on",q:b.q});});
+ return {items:out,meals:meals,uniq:uniq,batchDue:batchDue,season:season};
+}
+var checked={},deferred={};
+function viewShop(){
+ var el=document.getElementById("v-shop");el.innerHTML="";
+ var c=document.createElement("div");c.className="card";
+ c.innerHTML='<div class="label">Build the cart</div><div style="font-size:14px;color:var(--ink-soft);margin-bottom:14px;">Order any day. The list is built from the meals you are covering and what is actually due.</div>';
+ var ctrl=document.createElement("div");ctrl.className="ctrl";
+ ctrl.innerHTML='<div class="field"><label>Meals start</label><input type="date" id="sd" value="'+iso(today)+'" /></div>'+
+  '<div class="field"><label>Days covered</label><select id="dn">'+[5,6,7,8,9,10,11,12,14].map(function(n){return '<option value="'+n+'"'+(n===7?" selected":"")+'>'+n+' days</option>';}).join("")+'</select></div>';
+ c.appendChild(ctrl);
+ var go=document.createElement("button");go.className="btn wide";go.textContent="Build my list";c.appendChild(go);
+ el.appendChild(c);
+ var out=document.createElement("div");el.appendChild(out);
+ function render(){
+  var sd=fromIso(document.getElementById("sd").value);
+  var days=parseInt(document.getElementById("dn").value,10);
+  var r=buildList(sd,days);
+  out.innerHTML="";
+  // auto-smoothing: hold back big flexible items so one order never spikes
+  var autoHeld=[];
+  if(!Object.keys(deferred).length){
+   var trial=r.items.slice();
+   var t0=trial.reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
+   var tgt=getBudget()*(days/7);
+   if(t0>tgt){
+    var flexSorted=trial.filter(function(x){return x.it.flex;})
+      .sort(function(a,b){return (b.it.p*b.q)-(a.it.p*a.q);});
+    var running=t0;
+    for(var fi=0; fi<flexSorted.length && running>tgt; fi++){
+     var fx=flexSorted[fi];
+     autoHeld.push(fx.it.id);
+     running -= (fx.it.p||0)*(fx.q||1);
+    }
+   }
+  }
+  autoHeld.forEach(function(id){ if(!(id in deferred)) deferred[id]="auto"; });
+  var live=r.items.filter(function(x){return !deferred[x.it.id];});
+  var total=live.reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
+  var BUD=getBudget();
+  var target=BUD*(days/7);
+  var over=total>target;
+  var overCeiling=total>target*1.08;
+  var b=document.createElement("div");b.className="budget";
+  var pct=Math.min(100,total/target*100);
+  b.innerHTML='<div class="b-top"><div class="b-total '+(overCeiling?"over":over?"warn":"ok")+'">'+money(total)+'</div>'+
+   '<div class="b-target">budget <b id="budShow">'+money(target)+'</b><br><span id="budEdit" style="color:var(--terra);cursor:pointer;text-decoration:underline;font-size:12px;">change</span></div></div>'+
+   '<div class="b-bar"><i class="'+(overCeiling?"over":over?"warn":"")+'" style="width:'+pct+'%"></i></div>'+
+   '<div class="b-msg '+(overCeiling?"over":over?"warn":"")+'">'+(over
+     ? "Over by "+money(total-target)+". Push something to next order, or it eats into the untracked household spend."
+     : money(target-total)+" left for toiletries, cleaners, spices, and anything else this week.")+'</div>';
+  if(over){
+   var flex=r.items.filter(function(x){return x.it.flex&&!deferred[x.it.id];}).sort(function(a,b2){return (b2.it.p*b2.q)-(a.it.p*a.q);});
+   if(flex.length){
+    var tr=document.createElement("div");tr.className="trim";
+    tr.innerHTML='<div class="trim-h">Push to next order</div>';
+    flex.slice(0,6).forEach(function(x){
+     var row=document.createElement("div");row.className="trim-row";
+     row.innerHTML='<span class="tn">'+x.it.n+'</span><span class="tp">'+money((x.it.p||0)*(x.q||1))+'</span>';
+     var btn=document.createElement("button");btn.className="tbtn";btn.textContent="Defer";
+     btn.addEventListener("click",function(){deferred[x.it.id]=true;render();});
+     row.appendChild(btn);tr.appendChild(row);
+    });
+    b.appendChild(tr);
+   }
+  }
+  var dc=Object.keys(deferred).length;
+  var autoN=Object.keys(deferred).filter(function(k){return deferred[k]==="auto";}).length;
+  if(autoN){
+   var an=document.createElement("div");an.className="noteline";an.style.marginTop="12px";
+   an.innerHTML='<b>Smoothed for you</b>'+autoN+' shelf-stable item'+(autoN>1?'s were':' was')+' held back so this order stays near target. Nothing is lost, they come back next time. Tap below to add them anyway.';
+   b.appendChild(an);
+  }
+  var dc=Object.keys(deferred).length;
+  if(dc){
+   var un=document.createElement("button");un.className="btn wide";un.style.background="transparent";un.style.color="var(--green)";un.style.border="1px solid var(--rule)";
+   un.textContent="Add the "+dc+" held item"+(dc>1?"s":"")+" back";
+   un.addEventListener("click",function(){deferred={};render();});
+   b.appendChild(un);
+  }
+  var avg=weeklyAvg();
+  if(avg!==null){
+   var av=document.createElement("div");av.className="b-msg";av.style.marginTop="10px";
+   av.style.paddingTop="10px";av.style.borderTop="1px solid var(--rule-soft)";
+   var BUD2=getBudget();
+   av.innerHTML='Your real average over the last '+Math.min(history.length,8)+' order'+(history.length>1?'s':'')+': <b>'+money(avg)+'</b> a week'+
+     (avg>BUD2?' &mdash; running above your '+money(BUD2)+' budget.':' &mdash; comfortably inside your '+money(BUD2)+' budget.');
+   b.appendChild(av);
+  }
+  out.appendChild(b);
+  var be=document.getElementById("budEdit");
+  if(be) be.addEventListener("click",function(){
+   var cur=getBudget();
+   var v=prompt("Weekly budget, all in (food, health, household, toiletries):", cur);
+   if(v!==null){ var n=parseFloat(v); if(n>0){ setBudget(n); render(); } }
+  });
+  var endD=new Date(sd);endD.setDate(endD.getDate()+days-1);
+  var cov=document.createElement("div");cov.className="card";
+  cov.innerHTML='<div class="label">Covering &middot; '+r.season+'</div><div class="covering"><b>'+MON[sd.getMonth()]+" "+sd.getDate()+'</b> to <b>'+MON[endD.getMonth()]+" "+endD.getDate()+'</b>, '+days+' dinners</div><div class="mealpills">'+r.uniq.map(function(m){return '<span>'+m+'</span>';}).join("")+'</div>';
+  if(r.batchDue){var bw=document.createElement("div");bw.className="noteline warn";bw.innerHTML='<b>Batch day is due</b>Freezer add-ons included. Deferrable if the total runs high.';cov.appendChild(bw);}
+  out.appendChild(cov);
+  var withId=live.filter(function(x){return x.it.wid;});
+  var noId=live.filter(function(x){return !x.it.wid;});
+  if(withId.length){
+   var wc=document.createElement("div");wc.className="card";
+   wc.innerHTML='<div class="label">Send to Walmart</div><div style="font-size:14px;color:var(--ink-soft);margin-bottom:4px;">'+withId.length+' items load straight into your cart.</div>';
+   var wb=document.createElement("a");wb.className="btn wide";wb.style.display="block";wb.style.textAlign="center";wb.style.textDecoration="none";
+   wb.target="_blank";wb.rel="noopener";wb.textContent="Add "+withId.length+" items to Walmart cart";
+   wb.href="https://www.walmart.com/sc/cart/addToCart?items="+withId.map(function(x){return x.it.wid+"_"+(x.q||1);}).join(",");
+   wc.appendChild(wb);
+   if(noId.length){
+    var nn=document.createElement("div");nn.className="noteline warn";
+    nn.innerHTML='<b>Add these by hand</b>'+noId.map(function(x){return x.it.n;}).join(", ");
+    wc.appendChild(nn);
+   }
+   out.appendChild(wc);
+  }
+  var wrap=document.createElement("div");wrap.className="card";var n=0;
+  SECORDER.forEach(function(sec){
+   var items=r.items.filter(function(x){return x.it.s===sec;});
+   if(!items.length)return;
+   var sc=document.createElement("div");sc.className="sec";
+   var liveN=items.filter(function(x){return !deferred[x.it.id];}).length;
+   var subtotal=items.filter(function(x){return !deferred[x.it.id];}).reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
+   sc.innerHTML='<div class="sec-h"><span>'+sec+'</span><span class="cnt">'+liveN+' &middot; '+money(subtotal)+'</span></div>';
+   items.forEach(function(x){
+    n++;
+    var row=document.createElement("div");row.className="item";
+    if(deferred[x.it.id])row.classList.add("deferred");
+    if(checked[x.it.id])row.classList.add("done");
+    var bx=document.createElement("button");bx.className="box";bx.innerHTML=CHK;bx.setAttribute("aria-label","Check "+x.it.n);
+    var body=document.createElement("div");body.className="i-body";
+    var nm=document.createElement("div");nm.className="i-name";nm.textContent=x.it.n;body.appendChild(nm);
+    var why=deferred[x.it.id]===("auto")?"held back to protect your budget, back next order":deferred[x.it.id]?"deferred to next order":x.why;
+    if(why){var w=document.createElement("div");w.className="i-why"+(/since last|not logged/.test(why)?" due":"");w.textContent=why;body.appendChild(w);}
+    var rt=document.createElement("div");rt.className="i-right";
+    rt.innerHTML='<div class="i-qty">x'+(x.q||1)+'</div><div class="i-price">'+money((x.it.p||0)*(x.q||1))+'</div>';
+    bx.addEventListener("click",function(){checked[x.it.id]=!checked[x.it.id];row.classList.toggle("done",checked[x.it.id]);});
+    row.appendChild(bx);row.appendChild(body);row.appendChild(rt);
+    sc.appendChild(row);
+   });
+   wrap.appendChild(sc);
+  });
+  if(!n)wrap.innerHTML='<div class="empty">Nothing due. Check your dates.</div>';
+  out.appendChild(wrap);
+  var done=document.createElement("button");done.className="btn wide";done.textContent="Order placed, reset the clocks";
+  done.addEventListener("click",function(){
+   var t=iso(strip(new Date()));
+   live.forEach(function(x){if(G.some(function(g){return g.id===x.it.id;}))bought[x.it.id]=t;});
+   // held items keep their old date, so they stay due and return next order
+   SS("mealBought",JSON.stringify(bought));
+   logOrder(total,days);
+   if(r.batchDue&&live.some(function(x){return x.it.s==="Batch day";})){lastBatch=t;SS("mealBatch",t);}
+   checked={};deferred={};render();window.scrollTo({top:0,behavior:"smooth"});
+  });
+  out.appendChild(done);
+ }
+ go.addEventListener("click",function(){deferred={};render();});
+ render();
+}
+function viewWeek(){
+ var el=document.getElementById("v-week");el.innerHTML="";
+ var c=document.createElement("div");c.className="card";
+ c.innerHTML='<div class="label">Next 14 dinners</div>';
+ for(var i=0;i<14;i++){
+  var d=new Date(today);d.setDate(d.getDate()+i);
+  var row=document.createElement("div");row.className="weekrow"+(i===0?" today":"");
+  var sm=swaps[iso(d)];var rv=ratings[mealFor(d)];
+  row.innerHTML='<span class="w-day">'+(i===0?"Today":DAYA[d.getDay()]+" "+d.getDate())+'</span><span class="w-meal">'+mealFor(d)+(sm?' <span style="font-size:11px;color:var(--terra)">swapped</span>':'')+'</span>'+(FUN[d.getDay()]?'<span class="w-fun">fun</span>':'');
+  c.appendChild(row);
+ }
+ el.appendChild(c);
+}
+document.getElementById("title").textContent=DAYN[today.getDay()]+", "+MON[today.getMonth()]+" "+today.getDate();
+var sn=seasonOf(today);
+document.getElementById("sub").textContent="Family of 6. "+sn.charAt(0).toUpperCase()+sn.slice(1)+" plan. $350 a week all in.";
+var tabs=[["t-tonight","v-tonight"],["t-shop","v-shop"],["t-week","v-week"]];
+tabs.forEach(function(p){document.getElementById(p[0]).addEventListener("click",function(){
+ tabs.forEach(function(q){document.getElementById(q[0]).classList.toggle("on",q[0]===p[0]);
+  document.getElementById(q[1]).classList.toggle("hidden",q[1]!==p[1]);});});});
+viewTonight();viewShop();viewWeek();
+document.getElementById("foot").innerHTML="Four seasons, switching on their own. Dinners rotate every 28 days with no repeated protein or cuisine back to back.";
+var lk=iso(today);
+function roll(){if(iso(strip(new Date()))!==lk)location.reload();}
+document.addEventListener("visibilitychange",function(){if(!document.hidden)roll();});
+window.addEventListener("focus",roll);setInterval(roll,60000);
+})();
+</script>
+</body>
+</html>
