@@ -460,6 +460,89 @@ function scaleLine(x,factor){
  return amt+u+"  "+x.n;
 }
 
+// ---------- reusable recipe block ----------
+function recipeBlock(meal,openLabel){
+ var rx=RECIPE[meal];
+ if(!rx)return null;
+ var servings=6;
+ var det=document.createElement("details");det.className="intro";det.style.marginTop="12px";
+ var sm=document.createElement("summary");
+ sm.style.cssText="list-style:none;cursor:pointer;padding:13px 16px;display:flex;justify-content:space-between;font-family:Fraunces,serif;font-weight:600;font-size:16px;color:var(--green);";
+ sm.innerHTML='<span>'+(openLabel||"Recipe")+'</span><span style="color:var(--terra)">&#9662;</span>';
+ det.appendChild(sm);
+ var body=document.createElement("div");body.style.padding="0 18px 18px";
+ det.appendChild(body);
+ function draw(){
+  body.innerHTML="";
+  var factor=servings/rx.serves;
+  var sv=document.createElement("div");
+  sv.style.cssText="display:flex;align-items:center;gap:10px;padding:12px 0 14px;border-bottom:1px solid var(--rule-soft);margin-bottom:14px;";
+  var minus=document.createElement("button");minus.className="tbtn";minus.textContent="\u2212";
+  minus.style.cssText="border-color:var(--rule);color:var(--green);font-size:16px;padding:4px 12px;";
+  var cnt=document.createElement("span");
+  cnt.style.cssText="font-family:Fraunces,serif;font-weight:600;font-size:17px;min-width:92px;text-align:center;";
+  cnt.textContent=servings+" servings";
+  var plus=document.createElement("button");plus.className="tbtn";plus.textContent="+";
+  plus.style.cssText="border-color:var(--rule);color:var(--green);font-size:16px;padding:4px 12px;";
+  minus.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(servings>2){servings-=1;draw();}});
+  plus.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();if(servings<20){servings+=1;draw();}});
+  sv.appendChild(minus);sv.appendChild(cnt);sv.appendChild(plus);
+  if(servings!==6){
+   var rs=document.createElement("span");rs.style.cssText="font-size:12px;color:var(--terra);cursor:pointer;text-decoration:underline;";
+   rs.textContent="reset to 6";
+   rs.addEventListener("click",function(e){e.stopPropagation();servings=6;draw();});
+   sv.appendChild(rs);
+  }
+  body.appendChild(sv);
+  var ih=document.createElement("div");
+  ih.style.cssText="font-family:Fraunces,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:8px;";
+  ih.textContent="You need";
+  body.appendChild(ih);
+  var ul=document.createElement("div");ul.style.marginBottom="18px";
+  rx.ing.forEach(function(x){
+   var li=document.createElement("div");
+   li.style.cssText="display:flex;gap:10px;padding:5px 0;font-size:15px;border-bottom:1px solid var(--rule-soft);";
+   var a=document.createElement("span");
+   a.style.cssText="font-weight:600;min-width:80px;color:var(--green);";
+   a.textContent=fmtAmt(x.a*factor)+(x.u?" "+x.u:"");
+   var nn=document.createElement("span");nn.textContent=x.n;
+   li.appendChild(a);li.appendChild(nn);ul.appendChild(li);
+  });
+  body.appendChild(ul);
+  var sh=document.createElement("div");
+  sh.style.cssText="font-family:Fraunces,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:8px;";
+  sh.textContent="Steps";
+  body.appendChild(sh);
+  var ol=document.createElement("ol");
+  ol.style.cssText="margin:0;padding-left:20px;font-size:15px;line-height:1.6;";
+  rx.steps.forEach(function(s){var li=document.createElement("li");li.textContent=s;li.style.marginBottom="8px";ol.appendChild(li);});
+  body.appendChild(ol);
+  if(servings>6){
+   var st=STRETCH[meal];
+   if(st){
+    var sn=document.createElement("div");sn.className="noteline warn";sn.style.marginTop="14px";
+    sn.innerHTML='<b>Stretching it</b>'+st.how;
+    body.appendChild(sn);
+   }
+  }
+ }
+ draw();
+ return det;
+}
+
+// ---------- name exactly what to pull from the freezer ----------
+var THAWABLE={diced:"diced chicken breast",thighs:"chicken thighs",roast:"chuck roast",
+ chops:"pork loin chops",shrimp:"shrimp",mball:"meatballs",lasg:"lasagna",beef:"ground beef"};
+function thawDetail(meal){
+ var rx=RECIPE[meal];
+ if(!rx)return "";
+ var out=[];
+ rx.ing.forEach(function(x){
+  if(THAWABLE[x.g]) out.push(fmtAmt(x.a)+(x.u?" "+x.u:"")+" "+THAWABLE[x.g]);
+ });
+ return out.join(", ");
+}
+
 // ---------- meal ratings ----------
 var ratings=(function(){try{return JSON.parse(LS("mealRatings","{}"))||{};}catch(e){return {};}})();
 function rate(meal,v){
@@ -547,78 +630,9 @@ function viewTonight(){
  meta.innerHTML=h;c.appendChild(meta);
  if(info.mo){var m=document.createElement("div");m.className="noteline";m.innerHTML='<b>Morning of</b>'+info.mo;c.appendChild(m);}
  if(CILANTRO.indexOf(meal)>=0){var cl=document.createElement("div");cl.className="noteline";cl.innerHTML='<b>Rice</b>Cook the bulk rice, then stir in lime juice, chopped cilantro, and salt.';c.appendChild(cl);}
- var rx=RECIPE[meal];
- if(rx){
-  var servings=6;
-  var det=document.createElement("details");det.className="intro";det.style.marginTop="16px";
-  var sm=document.createElement("summary");
-  sm.style.cssText="list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;font-family:Fraunces,serif;font-weight:600;font-size:17px;color:var(--green);";
-  sm.innerHTML='<span>Recipe</span><span style="color:var(--terra)">&#9662;</span>';
-  det.appendChild(sm);
-  var body=document.createElement("div");body.style.padding="0 18px 18px";
-  det.appendChild(body);
+ var rb=recipeBlock(meal,"Recipe");
+ if(rb) c.appendChild(rb);
 
-  function drawRecipe(){
-   body.innerHTML="";
-   var factor=servings/rx.serves;
-   // serving stepper
-   var sv=document.createElement("div");
-   sv.style.cssText="display:flex;align-items:center;gap:10px;padding:12px 0 14px;border-bottom:1px solid var(--rule-soft);margin-bottom:14px;";
-   var minus=document.createElement("button");minus.className="tbtn";minus.textContent="\u2212";
-   minus.style.cssText="border-color:var(--rule);color:var(--green);font-size:16px;padding:4px 12px;";
-   var cnt=document.createElement("span");
-   cnt.style.cssText="font-family:Fraunces,serif;font-weight:600;font-size:17px;min-width:92px;text-align:center;";
-   cnt.textContent=servings+" servings";
-   var plus=document.createElement("button");plus.className="tbtn";plus.textContent="+";
-   plus.style.cssText="border-color:var(--rule);color:var(--green);font-size:16px;padding:4px 12px;";
-   minus.addEventListener("click",function(e){e.preventDefault();if(servings>2){servings-=1;drawRecipe();}});
-   plus.addEventListener("click",function(e){e.preventDefault();if(servings<20){servings+=1;drawRecipe();}});
-   sv.appendChild(minus);sv.appendChild(cnt);sv.appendChild(plus);
-   if(servings!==6){
-    var rs=document.createElement("span");rs.style.cssText="font-size:12px;color:var(--terra);cursor:pointer;text-decoration:underline;";
-    rs.textContent="reset to 6";
-    rs.addEventListener("click",function(){servings=6;drawRecipe();});
-    sv.appendChild(rs);
-   }
-   body.appendChild(sv);
-
-   var ih=document.createElement("div");
-   ih.style.cssText="font-family:Fraunces,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:8px;";
-   ih.textContent="You need";
-   body.appendChild(ih);
-   var ul=document.createElement("div");ul.style.marginBottom="18px";
-   rx.ing.forEach(function(x){
-    var li=document.createElement("div");
-    li.style.cssText="display:flex;gap:10px;padding:5px 0;font-size:15px;border-bottom:1px solid var(--rule-soft);";
-    var a=document.createElement("span");
-    a.style.cssText="font-weight:600;min-width:80px;color:var(--green);";
-    a.textContent=fmtAmt(x.a*factor)+(x.u?" "+x.u:"");
-    var nn=document.createElement("span");nn.textContent=x.n;
-    li.appendChild(a);li.appendChild(nn);ul.appendChild(li);
-   });
-   body.appendChild(ul);
-
-   var sh=document.createElement("div");
-   sh.style.cssText="font-family:Fraunces,serif;font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--terra);margin-bottom:8px;";
-   sh.textContent="Steps";
-   body.appendChild(sh);
-   var ol=document.createElement("ol");
-   ol.style.cssText="margin:0;padding-left:20px;font-size:15px;line-height:1.6;";
-   rx.steps.forEach(function(s){var li=document.createElement("li");li.textContent=s;li.style.marginBottom="8px";ol.appendChild(li);});
-   body.appendChild(ol);
-
-   if(servings>6){
-    var st=STRETCH[meal];
-    if(st){
-     var sn=document.createElement("div");sn.className="noteline warn";sn.style.marginTop="14px";
-     sn.innerHTML='<b>Stretching it</b>'+st.how;
-     body.appendChild(sn);
-    }
-   }
-  }
-  drawRecipe();
-  c.appendChild(det);
- }
  // feeding more
  var gs=document.createElement("div");gs.style.marginTop="16px";
  var grow=document.createElement("div");grow.style.display="flex";grow.style.alignItems="center";
@@ -716,9 +730,17 @@ function viewTonight(){
  var t=document.createElement("div");t.className="card";
  t.innerHTML='<div class="label">Tomorrow</div><div style="font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:2px 0 6px;">'+tmeal+'</div>';
  var w=document.createElement("div");
- if(tinfo.db){w.className="noteline warn";w.innerHTML='<b>Do this tonight</b>'+tinfo.db;}
+ if(tinfo.db){
+  var td=thawDetail(tmeal);
+  var txt=tinfo.db;
+  if(td && /thaw|move|fridge/i.test(txt)) txt = txt + ". Pull out: " + td;
+  w.className="noteline warn";w.innerHTML='<b>Do this tonight</b>'+txt;
+ }
  else{w.className="noteline";w.innerHTML='<b>Do this tonight</b>Nothing to prep. Enjoy your evening.';}
- t.appendChild(w);el.appendChild(t);
+ t.appendChild(w);
+ var trb=recipeBlock(tmeal,"See tomorrow's recipe");
+ if(trb) t.appendChild(trb);
+ el.appendChild(t);
 }
 function dueInfo(it,sd){
  if(it.cad===0)return null;
@@ -919,11 +941,86 @@ function viewWeek(){
  for(var i=0;i<14;i++){
   var d=new Date(today);d.setDate(d.getDate()+i);
   var row=document.createElement("div");row.className="weekrow"+(i===0?" today":"");
-  var sm=swaps[iso(d)];var rv=ratings[mealFor(d)];
-  row.innerHTML='<span class="w-day">'+(i===0?"Today":DAYA[d.getDay()]+" "+d.getDate())+'</span><span class="w-meal">'+mealFor(d)+(sm?' <span style="font-size:11px;color:var(--terra)">swapped</span>':'')+'</span>'+(FUN[d.getDay()]?'<span class="w-fun">fun</span>':'');
+  var dm=mealFor(d);
+  var sm=swaps[iso(d)];var rv=ratings[dm];
+  row.style.cursor="pointer";
+  row.innerHTML='<span class="w-day">'+(i===0?"Today":DAYA[d.getDay()]+" "+d.getDate())+'</span><span class="w-meal">'+dm+(sm?' <span style="font-size:11px;color:var(--terra)">swapped</span>':'')+(rv==="hit"?' <span style="font-size:11px;color:var(--green)">hit</span>':rv==="miss"?' <span style="font-size:11px;color:var(--muted)">miss</span>':'')+'</span>'+(FUN[d.getDay()]?'<span class="w-fun">fun</span>':'')+'<span style="color:var(--terra);font-size:13px;padding-left:8px;">&#9662;</span>';
+  var holder=document.createElement("div");
+  holder.style.cssText="display:none;padding:0 0 8px;";
+  (function(mealName,rowEl,hold){
+   var loaded=false;
+   rowEl.addEventListener("click",function(){
+    if(!loaded){
+     var dd=(D[mealName]||{}).db;
+     var td=thawDetail(mealName);
+     if(dd){
+      var pn=document.createElement("div");pn.className="noteline warn";pn.style.margin="8px 0 0";
+      pn.innerHTML='<b>Night before</b>'+dd+((td&&/thaw|move|fridge/i.test(dd))?". Pull out: "+td:"");
+      hold.appendChild(pn);
+     }
+     var b=recipeBlock(mealName,"Recipe");
+     if(b){ b.open=true; hold.appendChild(b); }
+     loaded=true;
+    }
+    hold.style.display = (hold.style.display==="block") ? "none" : "block";
+   });
+  })(dm,row,holder);
   c.appendChild(row);
+  c.appendChild(holder);
  }
  el.appendChild(c);
+
+ // ---- ratings summary ----
+ var rated=Object.keys(ratings);
+ var rc=document.createElement("div");rc.className="card";
+ rc.innerHTML='<div class="label">What your family thinks</div>';
+ if(!rated.length){
+  var e=document.createElement("div");e.className="empty";
+  e.textContent="No ratings yet. Tap Hit or Miss on the Tonight tab after dinner and they collect here.";
+  rc.appendChild(e);
+ } else {
+  var hits=rated.filter(function(m){return ratings[m]==="hit";}).sort();
+  var miss=rated.filter(function(m){return ratings[m]==="miss";}).sort();
+  var mk=function(title,list,col){
+   if(!list.length)return;
+   var hh=document.createElement("div");hh.className="sec";
+   hh.innerHTML='<div class="sec-h" style="color:'+col+';border-bottom-color:'+col+'33;"><span>'+title+'</span><span class="cnt">'+list.length+'</span></div>';
+   list.forEach(function(m){
+    var row=document.createElement("div");row.className="item";
+    var body=document.createElement("div");body.className="i-body";
+    body.innerHTML='<div class="i-name">'+m+'</div>';
+    var x=document.createElement("button");x.className="tbtn";
+    x.style.cssText="border-color:var(--rule);color:var(--muted);";
+    x.textContent="clear";
+    x.addEventListener("click",function(){delete ratings[m];SS("mealRatings",JSON.stringify(ratings));viewWeek();});
+    row.appendChild(body);row.appendChild(x);
+    hh.appendChild(row);
+   });
+   rc.appendChild(hh);
+  };
+  mk("Hits",hits,"var(--green)");
+  mk("Misses",miss,"var(--terra)");
+
+  // copyable summary for Claude
+  var cb=document.createElement("button");cb.className="btn wide";
+  cb.style.cssText="background:transparent;color:var(--green);border:1px solid var(--rule);";
+  cb.textContent="Copy ratings to send to Claude";
+  cb.addEventListener("click",function(){
+   var txt="MEAL RATINGS\n\nHITS:\n"+(hits.length?hits.map(function(m){return "- "+m;}).join("\n"):"- none yet")+
+           "\n\nMISSES:\n"+(miss.length?miss.map(function(m){return "- "+m;}).join("\n"):"- none yet");
+   var ta=document.createElement("textarea");
+   ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";
+   document.body.appendChild(ta);ta.select();
+   try{document.execCommand("copy");cb.textContent="Copied. Paste it to Claude.";}
+   catch(e){cb.textContent="Select and copy manually";}
+   setTimeout(function(){document.body.removeChild(ta);},100);
+  });
+  rc.appendChild(cb);
+  var nn=document.createElement("div");nn.className="foot";
+  nn.innerHTML="Rate meals as you cook them. When you have enough, send them to Claude and the misses get swapped out of the rotation.";
+  rc.appendChild(nn);
+ }
+ el.appendChild(rc);
 }
 document.getElementById("title").textContent=DAYN[today.getDay()]+", "+MON[today.getMonth()]+" "+today.getDate();
 var sn=seasonOf(today);
