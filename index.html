@@ -135,25 +135,29 @@
 "use strict";
 var ANCHOR=new Date(2026,5,21);
 var SUMMER=[
- ["Grilled hot dogs / brats","Chicken stir fry","Baked penne","Sausage + peppers","Chicken alfredo","Taco bar","Homemade pizza"],
- ["Chicken fajitas","Grilled burgers","Chicken chow mein","Breakfast for dinner","Spaghetti + meatballs","Grilled chicken + potatoes","Smoked lasagna"],
- ["Grilled pork chops + salad","Shrimp + chicken stir fry","Taco bar","Baked pork chops + potatoes","Chicken enchiladas","Grilled burgers + corn","Homemade pizza"],
- ["Teriyaki chicken + rice","Spaghetti","Potstickers + chicken fried rice","Grilled brats + veg","Sloppy joes","Grilled BBQ chicken + corn","Baked nachos"]];
+ ["Grilled brats + veg","Spaghetti + meatballs","Breakfast for dinner","Taco bar","Teriyaki chicken + rice","Grilled hot dogs / brats","Smoked lasagna"],
+ ["Shrimp + chicken stir fry","Spaghetti","Chicken fajitas","Sloppy joes","Potstickers + chicken fried rice","Grilled burgers","Homemade pizza"],
+ ["Chicken enchiladas","Baked penne","Grilled chicken + potatoes","Taco bar","Chicken chow mein","Baked nachos","Grilled BBQ chicken + corn"],
+ ["Sausage + peppers","Grilled burgers + corn","Chicken stir fry","Baked pork chops + potatoes","Chicken alfredo","Grilled pork chops + salad","Homemade pizza"]
+];
 var FALL=[
- ["Chicken + rice casserole","Spaghetti + meatballs","Sausage + peppers","Chicken tortilla soup","Slow cooker pot roast","Grilled BBQ chicken","Smoked lasagna"],
- ["Breakfast for dinner","Chicken chow mein","Baked penne","Baked pork chops + potatoes","Chicken alfredo","Baked nachos","Grilled pork chops + salad"],
- ["Teriyaki chicken + rice","Chili + cornbread","Chicken enchiladas","Sloppy joes","Chicken stir fry","Grilled brats + veg","Taco bar"],
- ["Chicken noodle soup","Spaghetti","Chicken fajitas","Beef stew","Potstickers + chicken fried rice","Grilled burgers","Homemade pizza"]];
+ ["Baked pork chops + potatoes","Spaghetti + meatballs","Chicken tortilla soup","Slow cooker pot roast","Chicken alfredo","Grilled pork chops + salad","Smoked lasagna"],
+ ["Chicken stir fry","Spaghetti","Potstickers + chicken fried rice","Grilled burgers","Chicken chow mein","Chili + cornbread","Homemade pizza"],
+ ["Chicken + rice casserole","Baked penne","Chicken fajitas","Sausage + peppers","Chicken noodle soup","Baked nachos","Grilled BBQ chicken"],
+ ["Breakfast for dinner","Sloppy joes","Chicken enchiladas","Beef stew","Teriyaki chicken + rice","Grilled brats + veg","Taco bar"]
+];
 var WINTER=[
- ["Chicken pot pie","Spaghetti + meatballs","Sausage + peppers","Teriyaki chicken + rice","Baked penne","Nuggets + fries + veg","Smoked lasagna"],
- ["Chicken tortilla soup","Spaghetti","Baked pork chops + potatoes","Chicken stir fry","Meatloaf + mashed potatoes","Homemade pizza","Chili + cornbread"],
- ["Chicken enchiladas","Beef stew","Chicken alfredo","Baked nachos","Chicken noodle soup","Taco bar","Breakfast for dinner"],
- ["Chicken fajitas","Sloppy joes","Chicken chow mein","Slow cooker pot roast","Potstickers + chicken fried rice","Homemade pizza","Taco soup"]];
+ ["Chicken noodle soup","Spaghetti + meatballs","Chicken stir fry","Sloppy joes","Chicken alfredo","Breakfast for dinner","Smoked lasagna"],
+ ["Chicken fajitas","Chili + cornbread","Chicken enchiladas","Slow cooker pot roast","Chicken chow mein","Taco bar","Homemade pizza"],
+ ["Beef stew","Sausage + peppers","Chicken pot pie","Spaghetti","Teriyaki chicken + rice","Taco soup","Nuggets + fries + veg"],
+ ["Baked penne","Baked pork chops + potatoes","Chicken tortilla soup","Meatloaf + mashed potatoes","Potstickers + chicken fried rice","Baked nachos","Homemade pizza"]
+];
 var SPRING=[
- ["Chicken fajitas","Sausage + peppers","Grilled chicken + potatoes","Baked nachos","Chicken alfredo","Grilled hot dogs / brats","Taco bar"],
- ["Shrimp + chicken stir fry","Breakfast for dinner","Teriyaki chicken + rice","Sloppy joes","Chicken enchiladas","Homemade pizza","Grilled BBQ chicken + corn"],
- ["Baked penne","Chicken chow mein","Grilled brats + veg","Potstickers + chicken fried rice","Spaghetti","Nuggets + fries + veg","Grilled burgers"],
- ["Chicken stir fry","Baked pork chops + potatoes","Chicken tortilla soup","Spaghetti + meatballs","Chicken + rice casserole","Grilled pork chops + salad","Smoked lasagna"]];
+ ["Chicken + rice casserole","Shrimp + chicken stir fry","Grilled BBQ chicken + corn","Baked penne","Potstickers + chicken fried rice","Grilled brats + veg","Smoked lasagna"],
+ ["Chicken chow mein","Spaghetti + meatballs","Chicken enchiladas","Baked pork chops + potatoes","Teriyaki chicken + rice","Taco bar","Grilled pork chops + salad"],
+ ["Chicken fajitas","Sausage + peppers","Chicken stir fry","Spaghetti","Grilled chicken + potatoes","Baked nachos","Nuggets + fries + veg"],
+ ["Breakfast for dinner","Grilled hot dogs / brats","Chicken tortilla soup","Sloppy joes","Chicken alfredo","Grilled burgers","Homemade pizza"]
+];
 var G=[
  {id:"salt",wid:"",n:"Salt, 26 oz (Amazon, not Walmart)",q:1,p:0.62,s:"Spices",cad:180,flex:1},
  {id:"pepper",wid:"44662573",n:"Black pepper, ground, 3 oz",q:1,p:3.58,s:"Spices",cad:180,flex:1},
@@ -439,7 +443,7 @@ function strip(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function iso(d){var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd;}
 function fromIso(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
 function dbet(a,b){return Math.round((strip(b)-strip(a))/86400000);}
-function seasonOf(d){var m=d.getMonth();if(m>=5&&m<=7)return "summer";if(m>=8&&m<=10)return "fall";if(m===11||m<=1)return "winter";return "spring";}
+function seasonOf(d){var k=d.getMonth()*100+d.getDate();if(k>=501&&k<=814)return "summer";if(k>=815&&k<=1030)return "fall";if(k>=1101||k<=219)return "winter";return "spring";}
 function planFor(d){var s=seasonOf(d);return s==="fall"?FALL:s==="winter"?WINTER:s==="spring"?SPRING:SUMMER;}
 function baseMeal(d){var i=dbet(ANCHOR,d);var m=((i%28)+28)%28;return planFor(d)[Math.floor(m/7)][m%7];}
 function mealFor(d){var k=iso(d);if(swaps[k])return swaps[k];return baseMeal(d);}
