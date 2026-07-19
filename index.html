@@ -84,7 +84,10 @@
   .sec-h{display:flex;align-items:baseline;justify-content:space-between;font-family:'Fraunces',serif;font-weight:600;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);padding-bottom:7px;border-bottom:2px solid rgba(47,93,80,.18);margin-bottom:4px;}
   .sec-h .cnt{font-family:'Inter',sans-serif;font-size:12px;letter-spacing:0;text-transform:none;color:var(--muted);font-weight:500;}
   .item{display:flex;align-items:flex-start;gap:12px;padding:11px 2px;border-bottom:1px solid var(--rule-soft);}
-  .item.done .i-name{text-decoration:line-through;color:var(--muted);}
+  .item.off{opacity:.45;}
+  .tag{display:inline-block;margin-left:7px;font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 6px;border-radius:5px;vertical-align:1px;}
+  .tag-r{background:rgba(47,93,80,.13);color:var(--green);}
+  .tag-s{background:rgba(0,0,0,.06);color:var(--muted);}
   .item.deferred{opacity:.4;}
   .box{flex:0 0 22px;width:22px;height:22px;margin-top:1px;border-radius:6px;border:2px solid var(--muted);background:transparent;cursor:pointer;display:grid;place-items:center;padding:0;}
   .item.done .box{background:var(--green);border-color:var(--green);}
@@ -152,20 +155,20 @@ var SPRING=[
  ["Baked penne","Chicken chow mein","Grilled brats + veg","Potstickers + chicken fried rice","Spaghetti","Nuggets + fries + veg","Grilled burgers"],
  ["Chicken stir fry","Baked pork chops + potatoes","Chicken tortilla soup","Spaghetti + meatballs","Chicken + rice casserole","Grilled pork chops + salad","Smoked lasagna"]];
 var G=[
- {id:"salt",wid:"",n:"Salt, 26 oz",q:1,p:0.62,s:"Spices",cad:180,flex:1},
- {id:"pepper",wid:"",n:"Black pepper, ground",q:1,p:4.12,s:"Spices",cad:180,flex:1},
- {id:"chilipow",wid:"",n:"Chili powder",q:1,p:2.28,s:"Spices",cad:120,flex:1},
- {id:"cumin",wid:"",n:"Ground cumin",q:1,p:2.28,s:"Spices",cad:120,flex:1},
- {id:"garpow",wid:"",n:"Garlic powder",q:1,p:2.14,s:"Spices",cad:120,flex:1},
- {id:"onionpow",wid:"",n:"Onion powder",q:1,p:2.14,s:"Spices",cad:180,flex:1},
- {id:"paprika",wid:"",n:"Smoked paprika",q:1,p:2.68,s:"Spices",cad:180,flex:1},
- {id:"italsn",wid:"",n:"Italian seasoning",q:1,p:2.28,s:"Spices",cad:180,flex:1},
- {id:"oregano",wid:"",n:"Oregano",q:1,p:2.14,s:"Spices",cad:180,flex:1},
- {id:"pepflake",wid:"",n:"Red pepper flakes",q:1,p:2.14,s:"Spices",cad:180,flex:1},
- {id:"ginger",wid:"",n:"Ground ginger",q:1,p:2.68,s:"Spices",cad:180,flex:1},
- {id:"thyme",wid:"",n:"Thyme",q:1,p:2.14,s:"Spices",cad:180,flex:1},
- {id:"bay",wid:"",n:"Bay leaves",q:1,p:2.28,s:"Spices",cad:365,flex:1},
- {id:"cinnamon",wid:"",n:"Ground cinnamon",q:1,p:2.14,s:"Spices",cad:180,flex:1},
+ {id:"salt",wid:"",n:"Salt, 26 oz (Amazon, not Walmart)",q:1,p:0.62,s:"Spices",cad:180,flex:1},
+ {id:"pepper",wid:"44662573",n:"Black pepper, ground, 3 oz",q:1,p:3.58,s:"Spices",cad:180,flex:1},
+ {id:"chilipow",wid:"157643393",n:"Chili powder, 3 oz",q:1,p:1.08,s:"Spices",cad:120,flex:1},
+ {id:"cumin",wid:"985501095",n:"Ground cumin, 2.5 oz",q:1,p:1.37,s:"Spices",cad:120,flex:1},
+ {id:"garpow",wid:"676979470",n:"Garlic powder, 3.4 oz",q:1,p:1.08,s:"Spices",cad:120,flex:1},
+ {id:"onionpow",wid:"705601418",n:"Onion powder, 3.25 oz",q:1,p:1.08,s:"Spices",cad:180,flex:1},
+ {id:"paprika",wid:"785841258",n:"Smoked paprika, 2 oz",q:1,p:2.08,s:"Spices",cad:180,flex:1},
+ {id:"italsn",wid:"637648335",n:"Italian seasoning, 0.95 oz",q:1,p:1.08,s:"Spices",cad:180,flex:1},
+ {id:"oregano",wid:"631368530",n:"Oregano leaves, 0.87 oz",q:1,p:1.08,s:"Spices",cad:180,flex:1},
+ {id:"pepflake",wid:"217612954",n:"Crushed red pepper, 1.75 oz",q:1,p:1.44,s:"Spices",cad:180,flex:1},
+ {id:"ginger",wid:"356986409",n:"Ground ginger, 1.5 oz",q:1,p:4.5,s:"Spices",cad:180,flex:1},
+ {id:"thyme",wid:"567535646",n:"Thyme leaves, 0.75 oz",q:1,p:2.12,s:"Spices",cad:180,flex:1},
+ {id:"bay",wid:"10315300",n:"Bay leaves, 0.12 oz",q:1,p:2.98,s:"Spices",cad:365,flex:1},
+ {id:"cinnamon",wid:"533272737",n:"Ground cinnamon, 2.5 oz",q:1,p:1.27,s:"Spices",cad:180,flex:1},
  {id:"fcorn",wid:"659879040",n:"Frozen whole kernel corn, 12 oz",q:1,p:0.98,s:"Frozen",cad:0,trig:["Chicken tortilla soup","Taco soup"]},
  {id:"shells",wid:"1657981925",n:"Taco shells, 12 ct",q:1,p:1.50,s:"Bread",cad:14},
  {id:"bcrumb",wid:"10315089",n:"Plain bread crumbs, 15 oz",q:1,p:1.22,s:"Backstock",cad:0,trig:["Meatloaf + mashed potatoes"]},
@@ -830,6 +833,7 @@ function dueInfo(it,sd){
  if(d>=it.cad)return {due:true,txt:d+" days since last"};
  return {due:false,txt:""};
 }
+function recipeNeeds(uniq){var s={};uniq.forEach(function(m){var r=RECIPE[m];if(!r||!r.ing)return;r.ing.forEach(function(i){s[i.g]=1;});});return s;}
 function buildList(sd,days){
  var meals=[],uniq=[];
  for(var i=0;i<days;i++){var d=new Date(sd);d.setDate(d.getDate()+i);var m=mealFor(d);meals.push(m);if(uniq.indexOf(m)<0)uniq.push(m);}
@@ -847,16 +851,19 @@ function buildList(sd,days){
   if(di&&di.due)out.push({it:it,why:di.txt,q:it.q});
  });
  var chick=meals.filter(function(m){return /chicken|fajita|teriyaki|enchilada|alfredo|chow mein|stir fry|potsticker|nugget/i.test(m);}).length;
- if(chick>=4)out.push({it:{id:"diced3",wid:"621164712",n:"Diced chicken, extra bag",q:1,p:7.94,s:"Protein"},why:"heavy chicken stretch ("+chick+" meals)",q:1});
+ if(chick>=4)out.push({it:{id:"diced3",wid:"621164712",n:"Diced chicken, extra bag",q:1,p:7.94,s:"Protein"},why:"heavy chicken stretch ("+chick+" meals)",q:1,need:true});
  var pepd=meals.filter(function(m){return /fajita|stir fry|pizza|sausage \+ peppers/i.test(m);}).length;
- if(pepd>=3)out.push({it:{id:"bell2",wid:"47770124",n:"Bell peppers, 2nd 3-pack",q:1,p:2.97,s:"Produce"},why:"pepper-heavy stretch ("+pepd+" meals)",q:1});
- if(uniq.indexOf("Sausage + peppers")>=0)out.push({it:{id:"isaus2",wid:"40711369",n:"Italian sausage, 2nd pack",q:1,p:3.92,s:"Protein"},why:"for Sausage + peppers",q:1});
+ if(pepd>=3)out.push({it:{id:"bell2",wid:"47770124",n:"Bell peppers, 2nd 3-pack",q:1,p:2.97,s:"Produce"},why:"pepper-heavy stretch ("+pepd+" meals)",q:1,need:true});
+ if(uniq.indexOf("Sausage + peppers")>=0)out.push({it:{id:"isaus2",wid:"40711369",n:"Italian sausage, 2nd pack",q:1,p:3.92,s:"Protein"},why:"for Sausage + peppers",q:1,need:true});
  var bd=lastBatch?dbet(fromIso(lastBatch),sd):999;
  var batchDue=(bd>=28);
- if(batchDue)BATCH.forEach(function(b){out.push({it:{id:b.id,n:b.n,q:b.q,p:b.p,s:"Batch day",flex:1},why:"freezer batch add-on",q:b.q});});
+ if(batchDue)BATCH.forEach(function(b){out.push({it:{id:b.id,n:b.n,q:b.q,p:b.p,s:"Batch day",flex:1},why:"freezer batch add-on",q:b.q,need:false});});
+ var need=recipeNeeds(uniq);
+ out.forEach(function(x){ if(x.need===undefined) x.need=!!(need[x.it.id]||x.it.trig); });
  return {items:out,meals:meals,uniq:uniq,batchDue:batchDue,season:season};
 }
-var checked={},deferred={};
+var checked={},deferred={},unsel={};
+function inOrder(x){return !deferred[x.it.id] && !unsel[x.it.id];}
 function viewShop(){
  var el=document.getElementById("v-shop");el.innerHTML="";
  var c=document.createElement("div");c.className="card";
@@ -891,7 +898,7 @@ function viewShop(){
    }
   }
   autoHeld.forEach(function(id){ if(!(id in deferred)) deferred[id]="auto"; });
-  var live=r.items.filter(function(x){return !deferred[x.it.id];});
+  var live=r.items.filter(inOrder);
   var total=live.reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
   var BUD=getBudget();
   var target=BUD*(days/7);
@@ -906,7 +913,7 @@ function viewShop(){
      ? "Over by "+money(total-target)+". Push something to next order, or it eats into the untracked household spend."
      : money(target-total)+" left for toiletries, cleaners, spices, and anything else this week.")+'</div>';
   if(over){
-   var flex=r.items.filter(function(x){return x.it.flex&&!deferred[x.it.id];}).sort(function(a,b2){return (b2.it.p*b2.q)-(a.it.p*a.q);});
+   var flex=r.items.filter(function(x){return x.it.flex&&inOrder(x);}).sort(function(a,b2){return (b2.it.p*b2.q)-(a.it.p*a.q);});
    if(flex.length){
     var tr=document.createElement("div");tr.className="trim";
     tr.innerHTML='<div class="trim-h">Push to next order</div>';
@@ -959,7 +966,7 @@ function viewShop(){
   var noId=live.filter(function(x){return !x.it.wid;});
   if(withId.length){
    var wc=document.createElement("div");wc.className="card";
-   wc.innerHTML='<div class="label">Send to Walmart</div><div style="font-size:14px;color:var(--ink-soft);margin-bottom:4px;">'+withId.length+' items load straight into your cart.</div>';
+   wc.innerHTML='<div class="label">Send to Walmart</div><div style="font-size:14px;color:var(--ink-soft);margin-bottom:4px;">'+withId.length+' checked items load straight into your cart. Uncheck anything on the list below to leave it out.</div>';
    var wb=document.createElement("a");wb.className="btn wide";wb.style.display="block";wb.style.textAlign="center";wb.style.textDecoration="none";
    wb.target="_blank";wb.rel="noopener";wb.textContent="Add "+withId.length+" items to Walmart cart";
    wb.href="https://www.walmart.com/sc/cart/addToCart?items="+withId.map(function(x){return x.it.wid+"_"+(x.q||1);}).join(",");
@@ -971,27 +978,51 @@ function viewShop(){
    }
    out.appendChild(wc);
   }
+  var recSum=r.items.filter(function(x){return x.need;}).reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
+  var stkItems=r.items.filter(function(x){return !x.need;});
+  var stkSum=stkItems.reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
+  var fc=document.createElement("div");fc.className="card";
+  fc.innerHTML='<div class="label">Recipe vs stock</div><div style="font-size:14px;color:var(--ink-soft);margin-bottom:12px;">Tagged <b>recipe</b> means a meal in this window cannot be cooked without it. Tagged <b>stock</b> means the pantry clock says it is time, not that a meal needs it.<br><br>Recipe ingredients <b>'+money(recSum)+'</b><br>Stock and household <b>'+money(stkSum)+'</b></div>';
+  if(stkItems.length){
+   var allOff=stkItems.every(function(x){return !inOrder(x);});
+   var fb=document.createElement("button");fb.className="btn wide";
+   fb.style.background="transparent";fb.style.color="var(--green)";fb.style.border="1px solid var(--rule)";fb.style.marginTop="0";
+   fb.textContent=allOff?("Add the "+stkItems.length+" stock items back"):("Recipe ingredients only, drop "+stkItems.length+" stock items");
+   fb.addEventListener("click",function(){
+    stkItems.forEach(function(x){ if(allOff){delete unsel[x.it.id];delete deferred[x.it.id];} else {unsel[x.it.id]=true;} });
+    render();
+   });
+   fc.appendChild(fb);
+  }
+  out.appendChild(fc);
   var wrap=document.createElement("div");wrap.className="card";var n=0;
   SECORDER.forEach(function(sec){
    var items=r.items.filter(function(x){return x.it.s===sec;});
    if(!items.length)return;
    var sc=document.createElement("div");sc.className="sec";
-   var liveN=items.filter(function(x){return !deferred[x.it.id];}).length;
-   var subtotal=items.filter(function(x){return !deferred[x.it.id];}).reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
+   var liveN=items.filter(inOrder).length;
+   var subtotal=items.filter(inOrder).reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
    sc.innerHTML='<div class="sec-h"><span>'+sec+'</span><span class="cnt">'+liveN+' &middot; '+money(subtotal)+'</span></div>';
    items.forEach(function(x){
     n++;
     var row=document.createElement("div");row.className="item";
     if(deferred[x.it.id])row.classList.add("deferred");
-    if(checked[x.it.id])row.classList.add("done");
+    if(inOrder(x))row.classList.add("done"); else row.classList.add("off");
     var bx=document.createElement("button");bx.className="box";bx.innerHTML=CHK;bx.setAttribute("aria-label","Check "+x.it.n);
     var body=document.createElement("div");body.className="i-body";
-    var nm=document.createElement("div");nm.className="i-name";nm.textContent=x.it.n;body.appendChild(nm);
+    var nm=document.createElement("div");nm.className="i-name";nm.textContent=x.it.n;
+    var tg=document.createElement("span");tg.className="tag "+(x.need?"tag-r":"tag-s");tg.textContent=x.need?"recipe":"stock";nm.appendChild(tg);
+    body.appendChild(nm);
     var why=deferred[x.it.id]===("auto")?"held back to protect your budget, back next order":deferred[x.it.id]?"deferred to next order":x.why;
     if(why){var w=document.createElement("div");w.className="i-why"+(/since last|not logged/.test(why)?" due":"");w.textContent=why;body.appendChild(w);}
     var rt=document.createElement("div");rt.className="i-right";
     rt.innerHTML='<div class="i-qty">x'+(x.q||1)+'</div><div class="i-price">'+money((x.it.p||0)*(x.q||1))+'</div>';
-    bx.addEventListener("click",function(){checked[x.it.id]=!checked[x.it.id];row.classList.toggle("done",checked[x.it.id]);});
+    bx.addEventListener("click",function(){
+     if(deferred[x.it.id]){delete deferred[x.it.id];delete unsel[x.it.id];}
+     else if(unsel[x.it.id]){delete unsel[x.it.id];}
+     else {unsel[x.it.id]=true;}
+     render();
+    });
     row.appendChild(bx);row.appendChild(body);row.appendChild(rt);
     sc.appendChild(row);
    });
@@ -1007,11 +1038,11 @@ function viewShop(){
    SS("mealBought",JSON.stringify(bought));
    logOrder(total,days);
    if(r.batchDue&&live.some(function(x){return x.it.s==="Batch day";})){lastBatch=t;SS("mealBatch",t);}
-   checked={};deferred={};render();window.scrollTo({top:0,behavior:"smooth"});
+   checked={};deferred={};unsel={};render();window.scrollTo({top:0,behavior:"smooth"});
   });
   out.appendChild(done);
  }
- go.addEventListener("click",function(){deferred={};render();});
+ go.addEventListener("click",function(){deferred={};unsel={};render();});
  render();
 }
 function viewWeek(){
