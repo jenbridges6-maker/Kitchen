@@ -135,28 +135,28 @@
 "use strict";
 var ANCHOR=new Date(2026,5,21);
 var SUMMER=[
- ["Grilled chicken + potatoes","Baked penne","Chicken fajitas","Sausage + peppers","Grilled burgers + corn","Breakfast for dinner","Smoked lasagna"],
- ["Grilled pork chops + salad","Taco bar","Chicken stir fry","Baked pork chops + potatoes","Potstickers + chicken fried rice","Grilled burgers","Homemade pizza"],
- ["Shrimp + chicken stir fry","Sloppy joes","Teriyaki chicken + rice","Spaghetti + meatballs","Grilled BBQ chicken + corn","Baked nachos","Grilled hot dogs / brats"],
- ["Chicken alfredo","Taco bar","Chicken chow mein","Spaghetti","Chicken enchiladas","Grilled brats + veg","Homemade pizza"]
+ ["Chicken fajitas","Grilled pork chops + salad","Baked penne","Baked pork chops + potatoes","Potstickers + chicken fried rice","Breakfast for dinner","Smoked lasagna"],
+ ["Grilled BBQ chicken + corn","Taco bar","Sausage + peppers","Sloppy joes","Chicken chow mein","Grilled burgers","Homemade pizza"],
+ ["Nuggets + fries + veg","Spaghetti + meatballs","Grilled chicken + potatoes","Spaghetti","Teriyaki chicken + rice","Baked nachos","Grilled hot dogs / brats"],
+ ["Taco bar","Chicken alfredo","Grilled burgers + corn","Chicken enchiladas","Shrimp + chicken stir fry","Grilled brats + veg","Homemade pizza"]
 ];
 var FALL=[
- ["Baked pork chops + potatoes","Spaghetti + meatballs","Chicken tortilla soup","Slow cooker pot roast","Chicken alfredo","Grilled pork chops + salad","Smoked lasagna"],
- ["Chicken stir fry","Spaghetti","Potstickers + chicken fried rice","Grilled burgers","Chicken chow mein","Chili + cornbread","Homemade pizza"],
- ["Chicken + rice casserole","Baked penne","Chicken fajitas","Sausage + peppers","Chicken noodle soup","Baked nachos","Grilled BBQ chicken"],
- ["Breakfast for dinner","Sloppy joes","Chicken enchiladas","Beef stew","Teriyaki chicken + rice","Grilled brats + veg","Taco bar"]
+ ["Chicken pot pie","Baked penne","Teriyaki chicken + rice","Baked pork chops + potatoes","Chicken alfredo","Grilled pork chops + salad","Smoked lasagna"],
+ ["Chicken tortilla soup","Spaghetti","Potstickers + chicken fried rice","Grilled burgers","Chicken enchiladas","Chili + cornbread","Homemade pizza"],
+ ["Chicken + rice casserole","Sausage + peppers","Chicken fajitas","Slow cooker pot roast","Breakfast for dinner","Baked nachos","Grilled BBQ chicken"],
+ ["Beef stew","Chicken chow mein","Sloppy joes","Chicken noodle soup","Spaghetti + meatballs","Grilled brats + veg","Taco bar"]
 ];
 var WINTER=[
- ["Chicken noodle soup","Spaghetti + meatballs","Chicken stir fry","Sloppy joes","Chicken alfredo","Breakfast for dinner","Smoked lasagna"],
- ["Chicken fajitas","Chili + cornbread","Chicken enchiladas","Slow cooker pot roast","Chicken chow mein","Taco bar","Homemade pizza"],
- ["Beef stew","Sausage + peppers","Chicken pot pie","Spaghetti","Teriyaki chicken + rice","Taco soup","Nuggets + fries + veg"],
- ["Baked penne","Baked pork chops + potatoes","Chicken tortilla soup","Meatloaf + mashed potatoes","Potstickers + chicken fried rice","Baked nachos","Homemade pizza"]
+ ["Chicken + rice casserole","Baked penne","Chicken tortilla soup","Sloppy joes","Chicken noodle soup","Breakfast for dinner","Smoked lasagna"],
+ ["Potstickers + chicken fried rice","Chili + cornbread","Chicken fajitas","Spaghetti + meatballs","Chicken pot pie","Taco bar","Homemade pizza"],
+ ["Teriyaki chicken + rice","Slow cooker pot roast","Sausage + peppers","Meatloaf + mashed potatoes","Chicken alfredo","Taco soup","Nuggets + fries + veg"],
+ ["Beef stew","Baked pork chops + potatoes","Chicken enchiladas","Spaghetti","Chicken chow mein","Baked nachos","Homemade pizza"]
 ];
 var SPRING=[
- ["Chicken + rice casserole","Shrimp + chicken stir fry","Grilled BBQ chicken + corn","Baked penne","Potstickers + chicken fried rice","Grilled brats + veg","Smoked lasagna"],
- ["Chicken chow mein","Spaghetti + meatballs","Chicken enchiladas","Baked pork chops + potatoes","Teriyaki chicken + rice","Taco bar","Grilled pork chops + salad"],
- ["Chicken fajitas","Sausage + peppers","Chicken stir fry","Spaghetti","Grilled chicken + potatoes","Baked nachos","Nuggets + fries + veg"],
- ["Breakfast for dinner","Grilled hot dogs / brats","Chicken tortilla soup","Sloppy joes","Chicken alfredo","Grilled burgers","Homemade pizza"]
+ ["Chicken + rice casserole","Sloppy joes","Chicken pot pie","Baked penne","Teriyaki chicken + rice","Grilled brats + veg","Smoked lasagna"],
+ ["Chicken fajitas","Baked pork chops + potatoes","Chicken enchiladas","Breakfast for dinner","Chicken chow mein","Taco bar","Grilled pork chops + salad"],
+ ["Grilled BBQ chicken + corn","Sausage + peppers","Grilled chicken + potatoes","Spaghetti + meatballs","Potstickers + chicken fried rice","Baked nachos","Nuggets + fries + veg"],
+ ["Spaghetti","Chicken tortilla soup","Grilled hot dogs / brats","Chicken alfredo","Shrimp + chicken stir fry","Grilled burgers","Homemade pizza"]
 ];
 var G=[
  {id:"salt",wid:"",n:"Salt, 26 oz (Amazon, not Walmart)",q:1,p:0.62,s:"Spices",cad:180,flex:1},
@@ -725,6 +725,7 @@ if(pantry===null){
  }
  savePantry();
 }
+(function(){var t=iso(today),ch=0;pantry.forEach(function(p){if(!p.done&&!p.kept&&p.due>=t&&mealFor(fromIso(p.due))!==p.m){p.kept=1;ch=1;}});if(ch)savePantry();})();
 function openFor(meal){
  return pantry.filter(function(p){return p.m===meal&&!p.done;}).sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0;})[0]||null;
 }
