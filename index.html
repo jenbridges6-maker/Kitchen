@@ -1001,6 +1001,15 @@ function buildList(sd,days){
  if(batchDue)BATCH.forEach(function(b){out.push({it:{id:b.id,n:b.n,q:b.q,p:b.p,s:"Batch day",flex:1},why:"freezer batch add-on",q:b.q,need:false});});
  var need=recipeNeeds(uniq);
  out.forEach(function(x){ if(x.need===undefined) x.need=!!(need[x.it.id]||x.it.trig); });
+ // name the meals each recipe item is for, in the order they come up
+ var usedBy={};
+ uniq.forEach(function(m){var rr=RECIPE[m];if(!rr||!rr.ing)return;rr.ing.forEach(function(i){var u=usedBy[i.g]=usedBy[i.g]||[];if(u.indexOf(m)<0)u.push(m);});});
+ out.forEach(function(x){
+  if(!x.need||!G.some(function(g){return g.id===x.it.id;}))return;
+  var ms=(usedBy[x.it.id]||[]).slice();
+  (x.it.trig||[]).forEach(function(m){if(uniq.indexOf(m)>=0&&ms.indexOf(m)<0)ms.push(m);});
+  if(ms.length)x.why="for "+ms.join(", ");
+ });
  return {items:out,meals:meals,uniq:uniq,batchDue:batchDue,season:season};
 }
 var checked={},deferred={},unsel={};
