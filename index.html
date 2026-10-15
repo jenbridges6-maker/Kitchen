@@ -486,7 +486,7 @@ function scaleLine(x,factor){
 
 
 // ---------- backup & restore ----------
-var BACKUP_KEYS=["mealBought","mealBatch","mealHistory","mealRatings","mealSwaps","mealBudget","mealPantry"];
+var BACKUP_KEYS=["mealBought","mealBatch","mealHistory","mealRatings","mealSwaps","mealBudget","mealPantry","mealUndo"];
 function makeBackup(){
  var o={v:1,app:"kitchen",saved:iso(strip(new Date())),data:{}};
  BACKUP_KEYS.forEach(function(k){var v=LS(k,null);if(v!==null)o.data[k]=v;});
@@ -928,8 +928,8 @@ function viewTonight(){
   panel.appendChild(h);
   if(!cands.length){
    var e=document.createElement("div");e.className="noteline warn";
-   e.innerHTML='<b>Nothing swappable</b>Log an order on the Shop tab first, so the app knows what is in your kitchen.';
-   panel.appendChild(e);return;
+   e.innerHTML='<b>No matches from your orders</b>Pick any meal below instead.';
+   panel.appendChild(e);
   }
   cands.slice(0,8).forEach(function(m){
    var row=document.createElement("div");row.className="item";row.style.cursor="pointer";
@@ -944,6 +944,17 @@ function viewTonight(){
    });
    panel.appendChild(row);
   });
+  var anyW=document.createElement("div");anyW.style.cssText="display:flex;gap:8px;margin-top:14px;";
+  var anyS=document.createElement("select");anyS.style.cssText="flex:1;padding:10px;border:1px solid var(--rule);border-radius:8px;font-size:14px;background:transparent;color:inherit;";
+  anyS.innerHTML='<option value="">Or make any meal instead...</option>'+allMeals().filter(function(m){return m!==meal;}).sort().map(function(m){return '<option>'+m+'</option>';}).join("");
+  var anyB=document.createElement("button");anyB.className="tbtn";anyB.textContent="Make this";
+  anyB.style.cssText="border-color:var(--green);background:var(--green);color:#fff;padding:6px 14px;";
+  anyB.addEventListener("click",function(){
+   if(!anyS.value)return;
+   cookTonight(anyS.value);
+   viewTonight(); viewWeek(); window.scrollTo({top:0,behavior:"smooth"});
+  });
+  anyW.appendChild(anyS);anyW.appendChild(anyB);panel.appendChild(anyW);
   var note=document.createElement("div");note.className="foot";
   note.innerHTML="The skipped meal is not lost. It moves to Still in your kitchen below so you can cook it another night.";
   panel.appendChild(note);
@@ -1101,6 +1112,28 @@ function viewShop(){
    b.appendChild(av);
   }
   out.appendChild(b);
+  var undo=null;try{undo=JSON.parse(LS("mealUndo","null"));}catch(e){undo=null;}
+  var tIso=iso(today);
+  var lastToday=history.length&&history[history.length-1].d===tIso;
+  if((undo&&undo.d===tIso&&lastToday)||(!undo&&lastToday)){
+   var ub=document.createElement("button");ub.className="btn wide";
+   ub.style.cssText="background:transparent;color:var(--terra);border:1px solid var(--terra);margin:0 0 16px;";
+   ub.textContent="Hit Order placed by mistake? Undo it";
+   ub.addEventListener("click",function(){
+    if(!confirm("Undo today's Order placed? Your list goes back to what it was before."))return;
+    if(undo&&undo.d===tIso){
+     bought=undo.bought;lastBatch=undo.batch||"";history=history.slice(0,undo.hist);pantry=undo.pantry;
+    } else {
+     Object.keys(bought).forEach(function(k){if(bought[k]===tIso)delete bought[k];});
+     history.pop();
+     pantry=pantry.filter(function(p){return p.ord!==tIso||p.kept;});
+    }
+    SS("mealBought",JSON.stringify(bought));SS("mealBatch",lastBatch);SS("mealHistory",JSON.stringify(history));savePantry();
+    SS("mealUndo","null");
+    render();viewTonight();viewWeek();window.scrollTo({top:0,behavior:"smooth"});
+   });
+   out.appendChild(ub);
+  }
   var wl=waiting();
   if(wl.length){
    var wn=document.createElement("div");wn.className="noteline warn";wn.style.margin="0 0 16px";
@@ -1118,12 +1151,12 @@ function viewShop(){
   cov.innerHTML='<div class="label">Covering &middot; '+r.season+'</div><div class="covering"><b>'+MON[sd.getMonth()]+" "+sd.getDate()+'</b> to <b>'+MON[endD.getMonth()]+" "+endD.getDate()+'</b>, '+days+' dinners</div><div class="mealpills">'+r.uniq.map(function(m){return '<span>'+m+'</span>';}).join("")+'</div>';
   if(r.batchDue){var bw=document.createElement("div");bw.className="noteline warn";bw.innerHTML='<b>Batch day is due</b>Freezer add-ons included. Deferrable if the total runs high.';cov.appendChild(bw);}
   out.appendChild(cov);
-  var withId=live.filter(function(x){return x.it.wid;});
+  var withId=live.filter(function(x){return x.it.wid;});var wc=null,wb=null;
   var noId=live.filter(function(x){return !x.it.wid;});
   if(withId.length){
-   var wc=document.createElement("div");wc.className="card";
+   wc=document.createElement("div");wc.className="card";
    wc.innerHTML='<div class="label">Send to Walmart</div><div style="font-size:14px;color:var(--ink-soft);margin-bottom:4px;">'+withId.length+' checked items load straight into your cart. Uncheck anything on the list below to leave it out.</div>';
-   var wb=document.createElement("a");wb.className="btn wide";wb.style.display="block";wb.style.textAlign="center";wb.style.textDecoration="none";
+   wb=document.createElement("a");wb.className="btn wide";wb.style.display="block";wb.style.textAlign="center";wb.style.textDecoration="none";
    wb.target="_blank";wb.rel="noopener";wb.textContent="Add "+withId.length+" items to Walmart cart";
    wb.href="https://www.walmart.com/sc/cart/addToCart?items="+withId.map(function(x){return x.it.wid+"_"+(x.q||1);}).join(",");
    wc.appendChild(wb);
@@ -1132,7 +1165,6 @@ function viewShop(){
     nn.innerHTML='<b>Add these by hand</b>'+noId.map(function(x){return x.it.n;}).join(", ");
     wc.appendChild(nn);
    }
-   out.appendChild(wc);
   }
   var recSum=r.items.filter(function(x){return x.need;}).reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
   var stkItems=r.items.filter(function(x){return !x.need;});
@@ -1186,9 +1218,23 @@ function viewShop(){
   });
   if(!n)wrap.innerHTML='<div class="empty">Nothing due. Check your dates.</div>';
   out.appendChild(wrap);
-  var done=document.createElement("button");done.className="btn wide";done.textContent="Order placed, reset the clocks";
+  var fin=document.createElement("div");fin.className="card";
+  fin.innerHTML='<div class="label">Finish your order</div>';
+  if(wc){
+   var s1=document.createElement("div");s1.style.cssText="font-family:Fraunces,serif;font-weight:600;font-size:15px;margin:4px 0 6px;color:#0071dc;";
+   s1.textContent="Step 1: send the list to Walmart";fin.appendChild(s1);
+   wb.style.background="#0071dc";wb.style.borderColor="#0071dc";wb.style.color="#fff";
+   wc.removeChild(wc.firstChild);
+   while(wc.firstChild)fin.appendChild(wc.firstChild);
+  }
+  var s2=document.createElement("div");s2.style.cssText="font-family:Fraunces,serif;font-weight:600;font-size:15px;margin:20px 0 6px;color:var(--green);";
+  s2.textContent="Step 2: after you check out on Walmart";fin.appendChild(s2);
+  var done=document.createElement("button");done.className="btn wide";done.textContent="I checked out, mark it all bought";
+  done.style.cssText="background:transparent;color:var(--green);border:2px solid var(--green);";
   done.addEventListener("click",function(){
+   if(!confirm("Did you already check out on Walmart? This marks everything on the list as bought and clears it."))return;
    var t=iso(strip(new Date()));
+   SS("mealUndo",JSON.stringify({d:t,bought:JSON.parse(JSON.stringify(bought)),batch:lastBatch,hist:history.length,pantry:JSON.parse(JSON.stringify(pantry))}));
    live.forEach(function(x){if(G.some(function(g){return g.id===x.it.id;}))bought[x.it.id]=t;});
    // held items keep their old date, so they stay due and return next order
    SS("mealBought",JSON.stringify(bought));
@@ -1197,7 +1243,8 @@ function viewShop(){
    if(r.batchDue&&live.some(function(x){return x.it.s==="Batch day";})){lastBatch=t;SS("mealBatch",t);}
    checked={};deferred={};unsel={};render();window.scrollTo({top:0,behavior:"smooth"});
   });
-  out.appendChild(done);
+  fin.appendChild(done);
+  out.appendChild(fin);
  }
  go.addEventListener("click",function(){deferred={};unsel={};render();});
  render();
