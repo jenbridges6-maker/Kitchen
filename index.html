@@ -483,7 +483,7 @@ function scaleLine(x,factor){
 
 
 // ---------- backup & restore ----------
-var BACKUP_KEYS=["mealBought","mealBatch","mealHistory","mealRatings","mealSwaps","mealBudget"];
+var BACKUP_KEYS=["mealBought","mealBatch","mealHistory","mealRatings","mealSwaps","mealBudget","mealPantry"];
 function makeBackup(){
  var o={v:1,app:"kitchen",saved:iso(strip(new Date())),data:{}};
  BACKUP_KEYS.forEach(function(k){var v=LS(k,null);if(v!==null)o.data[k]=v;});
@@ -701,6 +701,126 @@ function swapCandidates(d,current){
  return out;
 }
 
+// ---------- meals bought for but not cooked yet ----------
+// Each order logs one entry per dinner it covered. An entry stays open until it is
+// marked made or tossed, so a skipped meal never disappears with the calendar.
+var pantry=(function(){try{var v=LS("mealPantry",null);return v===null?null:(JSON.parse(v)||[]);}catch(e){return [];}})();
+function savePantry(){SS("mealPantry",JSON.stringify(pantry));}
+function prunePantry(){pantry=pantry.filter(function(p){return !p.done||dbet(fromIso(p.done),today)<=30;});}
+function addOrderToPantry(sd,days,ordIso){
+ for(var i=0;i<days;i++){
+  var d=new Date(sd);d.setDate(d.getDate()+i);var k=iso(d);var m=mealFor(d);
+  if(pantry.some(function(p){return p.due===k&&p.m===m;}))continue;
+  pantry.push({m:m,due:k,ord:ordIso});
+ }
+ prunePantry();savePantry();
+}
+if(pantry===null){
+ // first run: rebuild from the most recent logged order, assuming meals started the day it was placed
+ pantry=[];
+ var lo=history.length?history[history.length-1]:null;
+ if(lo&&lo.d&&lo.days&&dbet(fromIso(lo.d),today)<=21){
+  var s0=fromIso(lo.d);
+  for(var pi=0;pi<lo.days;pi++){var pd=new Date(s0);pd.setDate(pd.getDate()+pi);pantry.push({m:mealFor(pd),due:iso(pd),ord:lo.d});}
+ }
+ savePantry();
+}
+function openFor(meal){
+ return pantry.filter(function(p){return p.m===meal&&!p.done;}).sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0;})[0]||null;
+}
+function madeToday(meal){return pantry.some(function(p){return p.m===meal&&p.how==="made"&&p.done===iso(today);});}
+function markMade(meal){var p=openFor(meal);if(p){p.done=iso(today);p.how="made";p.kept=0;savePantry();return true;}return false;}
+function unmarkMade(meal){
+ var p=pantry.filter(function(q){return q.m===meal&&q.how==="made"&&q.done===iso(today);})[0];
+ if(p){delete p.done;delete p.how;savePantry();}
+}
+function closeEntry(p,how){p.done=iso(today);p.how=how;savePantry();}
+function hasBought(meal){return pantry.some(function(p){return p.m===meal&&!p.done;});}
+function waiting(){ // past dinners nobody confirmed, and meals confirmed still on hand
+ var t=iso(today);
+ return pantry.filter(function(p){return !p.done&&(p.kept||p.due<t);})
+  .sort(function(a,b){return a.due<b.due?-1:a.due>b.due?1:0;});
+}
+function cookTonight(m){
+ var t=iso(today);
+ // the meal that was planned for tonight is now waiting instead
+ pantry.forEach(function(p){if(!p.done&&p.due===t&&p.m!==m)p.kept=1;});
+ var me=openFor(m);if(me)me.kept=1;
+ swaps[t]=m;SS("mealSwaps",JSON.stringify(swaps));savePantry();
+}
+function kitchenCard(){
+ var list=waiting();
+ var card=document.createElement("div");card.className="card";
+ card.innerHTML='<div class="label">Still in your kitchen</div>';
+ var past=list.filter(function(p){return !p.kept;});
+ var kept=list.filter(function(p){return p.kept;});
+ if(!list.length){
+  var e=document.createElement("div");e.className="empty";
+  e.textContent=pantry.length?"Nothing waiting. Every meal you shopped for is cooked or still ahead on the calendar.":"Tap \"Order placed\" on the Shop tab and the meals you bought for are tracked here until you cook them.";
+  card.appendChild(e);
+ }
+ function row(p,buttons,sub){
+  var wrap=document.createElement("div");
+  var r=document.createElement("div");r.className="item";r.style.cursor="pointer";
+  var body=document.createElement("div");body.className="i-body";
+  var age=dbet(fromIso(p.ord),today);
+  body.innerHTML='<div class="i-name">'+p.m+'</div><div class="i-why'+(age>7?' due':'')+'">'+sub+(age>7?' &middot; bought '+age+' days ago, check the fresh stuff':'')+'</div>';
+  var right=document.createElement("div");right.className="i-right";right.style.display="flex";right.style.gap="6px";
+  buttons.forEach(function(b){
+   var x=document.createElement("button");x.className="tbtn";x.textContent=b[0];
+   x.style.cssText=b[2]?"border-color:var(--green);background:var(--green);color:#fff;":"border-color:var(--rule);color:var(--muted);";
+   x.addEventListener("click",function(ev){ev.stopPropagation();b[1]();viewTonight();viewWeek();});
+   right.appendChild(x);
+  });
+  r.appendChild(body);r.appendChild(right);
+  var hold=document.createElement("div");hold.style.display="none";var loaded=false;
+  r.addEventListener("click",function(){
+   if(!loaded){var rb=recipeBlock(p.m,"Recipe");if(rb){rb.open=true;hold.appendChild(rb);}loaded=true;}
+   hold.style.display=hold.style.display==="block"?"none":"block";
+  });
+  wrap.appendChild(r);wrap.appendChild(hold);return wrap;
+ }
+ function dayLabel(p){var d=fromIso(p.due);return "planned "+DAYA[d.getDay()]+" "+MON[d.getMonth()]+" "+d.getDate();}
+ if(past.length){
+  var h=document.createElement("div");h.className="sec";
+  h.innerHTML='<div class="sec-h"><span>Did you make these?</span><span class="cnt">'+past.length+'</span></div>';
+  past.forEach(function(p){
+   h.appendChild(row(p,[["Made it",function(){closeEntry(p,"made");}],["Still have it",function(){p.kept=1;savePantry();},1]],dayLabel(p)));
+  });
+  card.appendChild(h);
+ }
+ if(kept.length){
+  var k=document.createElement("div");k.className="sec";
+  k.innerHTML='<div class="sec-h"><span>Ready to cook</span><span class="cnt">'+kept.length+'</span></div>';
+  var tm=mealFor(today);
+  kept.forEach(function(p){
+   var btns=[["Toss",function(){closeEntry(p,"tossed");}]];
+   if(p.m!==tm)btns.push(["Cook tonight",function(){cookTonight(p.m);window.scrollTo({top:0,behavior:"smooth"});},1]);
+   else btns.push(["Made it",function(){closeEntry(p,"made");},1]);
+   k.appendChild(row(p,btns,p.m===tm?"on for tonight":dayLabel(p)));
+  });
+  card.appendChild(k);
+ }
+ // add one by hand
+ var add=document.createElement("div");add.style.cssText="display:flex;gap:8px;margin-top:14px;";
+ var sel=document.createElement("select");sel.style.cssText="flex:1;padding:10px;border:1px solid var(--rule);border-radius:8px;font-size:14px;background:transparent;color:inherit;";
+ sel.innerHTML='<option value="">Have groceries for another meal?</option>'+allMeals().slice().sort().map(function(m){return '<option>'+m+'</option>';}).join("");
+ var ab=document.createElement("button");ab.className="tbtn";ab.textContent="Add";
+ ab.style.cssText="border-color:var(--green);color:var(--green);padding:6px 14px;";
+ ab.addEventListener("click",function(){
+  if(!sel.value)return;
+  var y=new Date(today);y.setDate(y.getDate()-1);
+  pantry.push({m:sel.value,due:iso(y),ord:iso(today),kept:1});savePantry();viewTonight();viewWeek();
+ });
+ add.appendChild(sel);add.appendChild(ab);card.appendChild(add);
+ if(list.length){
+  var n=document.createElement("div");n.className="foot";
+  n.innerHTML="Tap a meal to see its recipe. <b>Made it</b> and <b>Toss</b> clear it off the list.";
+  card.appendChild(n);
+ }
+ return card;
+}
+
 function viewTonight(){
  var el=document.getElementById("v-tonight");el.innerHTML="";
  var meal=mealFor(today);var info=D[meal]||{};
@@ -717,6 +837,11 @@ function viewTonight(){
  meta.innerHTML=h;c.appendChild(meta);
  if(info.mo){var m=document.createElement("div");m.className="noteline";m.innerHTML='<b>Morning of</b>'+info.mo;c.appendChild(m);}
  if(CILANTRO.indexOf(meal)>=0){var cl=document.createElement("div");cl.className="noteline";cl.innerHTML='<b>Rice</b>Cook the bulk rice, then stir in lime juice, chopped cilantro, and salt.';c.appendChild(cl);}
+ if(pantry.length&&!hasBought(meal)&&!madeToday(meal)){
+  var nb=document.createElement("div");nb.className="noteline warn";
+  nb.innerHTML='<b>Not in an order</b>You did not shop for this one. Pick a meal from Still in your kitchen below, or swap.';
+  c.appendChild(nb);
+ }
  var rb=recipeBlock(meal,"Recipe");
  if(rb) c.appendChild(rb);
 
@@ -757,8 +882,14 @@ function viewTonight(){
 
  // rating
  var rt=document.createElement("div");rt.style.marginTop="16px";
- rt.style.display="flex";rt.style.alignItems="center";rt.style.gap="10px";
+ rt.style.display="flex";rt.style.alignItems="center";rt.style.gap="10px";rt.style.flexWrap="wrap";
  var rlab=document.createElement("span");rlab.style.fontSize="13.5px";rlab.style.color="var(--muted)";
+ var mdb=document.createElement("button");mdb.className="tbtn";
+ var md=madeToday(meal);
+ mdb.style.cssText=md?"border-color:var(--green);background:var(--green);color:#fff;":"border-color:var(--rule);color:var(--muted);";
+ mdb.textContent=md?"Made it \u2713":"Made it";
+ mdb.addEventListener("click",function(){if(madeToday(meal))unmarkMade(meal);else markMade(meal);viewTonight();viewWeek();});
+ rt.appendChild(mdb);
  rlab.textContent="How did it go?";
  rt.appendChild(rlab);
  [["hit","Hit"],["miss","Miss"]].forEach(function(pair){
@@ -768,7 +899,7 @@ function viewTonight(){
   bb.style.color=ratings[meal]===pair[0]?"#fff":"var(--muted)";
   bb.style.background=ratings[meal]===pair[0]?"var(--green)":"transparent";
   bb.textContent=pair[1];
-  bb.addEventListener("click",function(){rate(meal,pair[0]);viewTonight();});
+  bb.addEventListener("click",function(){rate(meal,pair[0]);if(ratings[meal]&&!madeToday(meal))markMade(meal);viewTonight();});
   rt.appendChild(bb);
  });
  c.appendChild(rt);
@@ -783,10 +914,11 @@ function viewTonight(){
  sw.appendChild(swBtn);
  var panel=document.createElement("div");panel.style.display="none";sw.appendChild(panel);
  swBtn.addEventListener("click",function(){
-  if(swaps[iso(today)]){ delete swaps[iso(today)]; SS("mealSwaps",JSON.stringify(swaps)); viewTonight(); viewWeek(); return; }
+  if(swaps[iso(today)]){ var t0=iso(today); pantry.forEach(function(p){if(!p.done&&p.due===t0&&p.m===baseMeal(today))p.kept=0;}); savePantry(); delete swaps[t0]; SS("mealSwaps",JSON.stringify(swaps)); viewTonight(); viewWeek(); return; }
   if(panel.style.display==="block"){panel.style.display="none";return;}
   panel.style.display="block";panel.innerHTML="";
-  var cands=swapCandidates(today,meal);
+  var mine=[];waiting().forEach(function(p){if(p.m!==meal&&mine.indexOf(p.m)<0)mine.push(p.m);});
+  var cands=mine.concat(swapCandidates(today,meal).filter(function(m){return mine.indexOf(m)<0;}));
   var h=document.createElement("div");h.className="noteline";
   h.innerHTML='<b>You already have what these need</b>Picked from what you actually bought. Fastest first.';
   panel.appendChild(h);
@@ -798,22 +930,23 @@ function viewTonight(){
   cands.slice(0,8).forEach(function(m){
    var row=document.createElement("div");row.className="item";row.style.cursor="pointer";
    var body=document.createElement("div");body.className="i-body";
-   body.innerHTML='<div class="i-name">'+m+'</div><div class="i-why">'+((D[m]||{}).hd||"")+'</div>';
+   body.innerHTML='<div class="i-name">'+m+'</div><div class="i-why">'+(mine.indexOf(m)>=0?"in your kitchen &middot; ":"")+((D[m]||{}).hd||"")+'</div>';
    var rt=document.createElement("div");rt.className="i-right";
    rt.innerHTML='<div class="i-qty">'+((D[m]||{}).st||"")+'</div>';
    row.appendChild(body);row.appendChild(rt);
    row.addEventListener("click",function(){
-    swaps[iso(today)]=m; SS("mealSwaps",JSON.stringify(swaps));
+    cookTonight(m);
     viewTonight(); viewWeek(); window.scrollTo({top:0,behavior:"smooth"});
    });
    panel.appendChild(row);
   });
   var note=document.createElement("div");note.className="foot";
-  note.innerHTML="The skipped meal is not lost. It comes back around on the next 28 day cycle.";
+  note.innerHTML="The skipped meal is not lost. It moves to Still in your kitchen below so you can cook it another night.";
   panel.appendChild(note);
  });
  c.appendChild(sw);
  el.appendChild(c);
+ el.appendChild(kitchenCard());
  var t=document.createElement("div");t.className="card";
  t.innerHTML='<div class="label">Tomorrow</div><div style="font-family:Fraunces,serif;font-weight:600;font-size:20px;margin:2px 0 6px;">'+tmeal+'</div>';
  var w=document.createElement("div");
@@ -955,6 +1088,12 @@ function viewShop(){
    b.appendChild(av);
   }
   out.appendChild(b);
+  var wl=waiting();
+  if(wl.length){
+   var wn=document.createElement("div");wn.className="noteline warn";wn.style.margin="0 0 16px";
+   wn.innerHTML='<b>Already in your kitchen</b>You still have groceries for '+wl.length+' meal'+(wl.length>1?'s':'')+': '+wl.map(function(p){return p.m;}).join(", ")+'. Cover '+wl.length+' fewer day'+(wl.length>1?'s':'')+' and cook those first.';
+   out.appendChild(wn);
+  }
   var be=document.getElementById("budEdit");
   if(be) be.addEventListener("click",function(){
    var cur=getBudget();
@@ -1041,6 +1180,7 @@ function viewShop(){
    // held items keep their old date, so they stay due and return next order
    SS("mealBought",JSON.stringify(bought));
    logOrder(total,days);
+   addOrderToPantry(sd,days,t);
    if(r.batchDue&&live.some(function(x){return x.it.s==="Batch day";})){lastBatch=t;SS("mealBatch",t);}
    checked={};deferred={};unsel={};render();window.scrollTo({top:0,behavior:"smooth"});
   });
@@ -1059,7 +1199,8 @@ function viewWeek(){
   var dm=mealFor(d);
   var sm=swaps[iso(d)];var rv=ratings[dm];
   row.style.cursor="pointer";
-  row.innerHTML='<span class="w-day">'+(i===0?"Today":DAYA[d.getDay()]+" "+d.getDate())+'</span><span class="w-meal">'+dm+(sm?' <span style="font-size:11px;color:var(--terra)">swapped</span>':'')+(rv==="hit"?' <span style="font-size:11px;color:var(--green)">hit</span>':rv==="miss"?' <span style="font-size:11px;color:var(--muted)">miss</span>':'')+'</span>'+(FUN[d.getDay()]?'<span class="w-fun">fun</span>':'')+'<span style="color:var(--terra);font-size:13px;padding-left:8px;">&#9662;</span>';
+  var bt=pantry.some(function(p){return p.m===dm&&!p.done;});
+  row.innerHTML='<span class="w-day">'+(i===0?"Today":DAYA[d.getDay()]+" "+d.getDate())+'</span><span class="w-meal">'+dm+(bt?' <span style="font-size:11px;color:var(--green)">bought</span>':'')+(sm?' <span style="font-size:11px;color:var(--terra)">swapped</span>':'')+(rv==="hit"?' <span style="font-size:11px;color:var(--green)">hit</span>':rv==="miss"?' <span style="font-size:11px;color:var(--muted)">miss</span>':'')+'</span>'+(FUN[d.getDay()]?'<span class="w-fun">fun</span>':'')+'<span style="color:var(--terra);font-size:13px;padding-left:8px;">&#9662;</span>';
   var holder=document.createElement("div");
   holder.style.cssText="display:none;padding:0 0 8px;";
   (function(mealName,rowEl,hold){
@@ -1140,7 +1281,7 @@ function viewWeek(){
 }
 document.getElementById("title").textContent=DAYN[today.getDay()]+", "+MON[today.getMonth()]+" "+today.getDate();
 var sn=seasonOf(today);
-document.getElementById("sub").textContent="Family of 6. "+sn.charAt(0).toUpperCase()+sn.slice(1)+" plan. $350 a week all in.";
+document.getElementById("sub").textContent="Family of 6. "+sn.charAt(0).toUpperCase()+sn.slice(1)+" plan. $"+getBudget()+" a week all in.";
 var tabs=[["t-tonight","v-tonight"],["t-shop","v-shop"],["t-week","v-week"]];
 tabs.forEach(function(p){document.getElementById(p[0]).addEventListener("click",function(){
  tabs.forEach(function(q){document.getElementById(q[0]).classList.toggle("on",q[0]===p[0]);
