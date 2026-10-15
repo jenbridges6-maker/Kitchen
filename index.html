@@ -1115,7 +1115,7 @@ function viewShop(){
   var undo=null;try{undo=JSON.parse(LS("mealUndo","null"));}catch(e){undo=null;}
   var tIso=iso(today);
   var lastToday=history.length&&history[history.length-1].d===tIso;
-  if((undo&&undo.d===tIso&&lastToday)||(!undo&&lastToday)){
+  if(undo&&undo.d===tIso&&lastToday){
    var ub=document.createElement("button");ub.className="btn wide";
    ub.style.cssText="background:transparent;color:var(--terra);border:1px solid var(--terra);margin:0 0 16px;";
    ub.textContent="Hit Order placed by mistake? Undo it";
