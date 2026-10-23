@@ -578,10 +578,12 @@ function backupCard(){
 }
 
 // ---------- reusable recipe block ----------
+var RB_STATE={};
 function recipeBlock(meal,openLabel){
  var rx=RECIPE[meal];
  if(!rx)return null;
- var servings=6;
+ var rk=meal+"|"+(openLabel||"Recipe"),rs0=RB_STATE[rk]||(RB_STATE[rk]={open:false,servings:6,indoor:false});
+ var servings=rs0.servings;
  var det=document.createElement("details");det.className="intro";det.style.marginTop="12px";
  var sm=document.createElement("summary");
  sm.style.cssText="list-style:none;cursor:pointer;padding:13px 16px;display:flex;justify-content:space-between;font-family:Fraunces,serif;font-weight:600;font-size:16px;color:var(--green);";
@@ -589,7 +591,10 @@ function recipeBlock(meal,openLabel){
  det.appendChild(sm);
  var body=document.createElement("div");body.style.padding="0 18px 18px";
  det.appendChild(body);
+ det.open=rs0.open;
+ det.addEventListener("toggle",function(){rs0.open=det.open;});
  function draw(){
+  rs0.servings=servings;
   body.innerHTML="";
   var factor=servings/rx.serves;
   var sv=document.createElement("div");
@@ -640,7 +645,7 @@ function recipeBlock(meal,openLabel){
    isum.textContent="Cook it inside instead";ins.appendChild(isum);
    var iol=document.createElement("ol");iol.style.cssText="margin:8px 0 0;padding-left:20px;font-size:15px;line-height:1.6;";
    rx.indoor.forEach(function(s){var li=document.createElement("li");li.textContent=s;li.style.marginBottom="8px";iol.appendChild(li);});
-   ins.appendChild(iol);body.appendChild(ins);
+   ins.appendChild(iol);ins.open=rs0.indoor;ins.addEventListener("toggle",function(){rs0.indoor=ins.open;});body.appendChild(ins);
   }
   if(servings>6){
    var st=STRETCH[meal];
@@ -1024,7 +1029,7 @@ function syncRun(){
  return syncPost({read:true}).then(function(r){
   if(r&&r.error==="bad token"){try{localStorage.removeItem("kitchenKey");}catch(e){}syncState.err="bad key";finish(false);viewWeek();return false;}
   if(!r||!r.ok){syncState.err=(r&&r.error)||"no answer";return finish(false);}
-  var lr=syncRows(),merged={},anyLocal=false;
+  var lr=syncRows(),merged={},anyLocal=false,snap=function(){return JSON.stringify([syncRows(),bought,String(getBudget()),lastBatch||""]);},before=snap();
   var base=syncBase();
   if(!base){
    base={bt:{},od:{},rt:{},sw:{},budget:null};
@@ -1046,7 +1051,7 @@ function syncRun(){
   var batchNewer=lastBatch&&(!st.batch_last||lastBatch>st.batch_last);if(batchNewer)anyLocal=true;
   syncApply({Items:r.Items,Bought:merged.Bought,Orders:merged.Orders,Ratings:merged.Ratings,Swaps:merged.Swaps,Settings:budgetLocal?(r.Settings||[]).filter(function(x){return x.key!=="budget";}):r.Settings});
   var saveBase=function(){var nr=syncRows(),nb={budget:String(getBudget())};SYNC_TABS.forEach(function(s){nb[s[0]]=syncMap(nr[s[0]],s[0],s[2]);});syncRaw("mealSyncBase",JSON.stringify(nb));};
-  var done=function(stamp){saveBase();syncRaw("mealSyncAt",stamp);syncState.last=new Date().toISOString();syncState.err=null;viewTonight();viewShop();viewWeek();return finish(true);};
+  var done=function(stamp){saveBase();syncRaw("mealSyncAt",stamp);syncState.last=new Date().toISOString();syncState.err=null;if(snap()!==before){var y=window.scrollY;viewTonight();viewShop();viewWeek();window.scrollTo(0,y);}return finish(true);};
   if(!anyLocal)return done(st.updated_at||"");
   var now=new Date().toISOString();
   return syncPost({who:"app",ops:[
