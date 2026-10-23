@@ -984,62 +984,92 @@ function syncRows(){
   sw:Object.keys(swaps).map(function(d){var t=trades[d]||{};return {date:d,meal:swaps[d],trade_from:t.fd||"",trade_to:t.cur||""};})
  };
 }
-function syncPush(){
- if(!syncKey())return Promise.resolve();
- var now=new Date().toISOString(),r=syncRows();
- syncState.busy=true;syncBadge();
- return syncPost({who:"app",ops:[
-  {tab:"Items",mode:"upsert",key:"id",rows:r.items},
-  {tab:"Bought",mode:"replace",rows:r.bt},
-  {tab:"Orders",mode:"replace",rows:r.od},
-  {tab:"Ratings",mode:"replace",rows:r.rt},
-  {tab:"Swaps",mode:"replace",rows:r.sw},
-  {tab:"Settings",mode:"upsert",key:"key",rows:[{key:"updated_at",value:now},{key:"updated_by",value:"app"},{key:"batch_last",value:lastBatch||""},{key:"budget",value:String(getBudget())}]}
- ]}).then(function(res){syncState.busy=false;if(res&&res.ok){syncRaw("mealSyncAt",now);syncState.last=now;syncState.err=null;}else{syncState.err=(res&&res.error)||"no answer";}syncBadge();})
- .catch(function(e){syncState.busy=false;syncState.err="offline";syncBadge();});
+// Sync model: three-way merge, row by row. "base" is what this device last saw in the Sheet.
+// A row this device changed since base wins; every other row comes from the Sheet.
+// So a stale phone or tablet can never wipe out check-offs made on the other device.
+var SYNC_TABS=[["bt","Bought",function(x){return x.meal+"|"+x.ord;}],["od","Orders",function(x){return x.date;}],["rt","Ratings",function(x){return x.meal;}],["sw","Swaps",function(x){return x.date;}]];
+var syncRunning=false,syncAgain=false;
+function syncStr(v){return v===null||v===undefined?"":String(v);}
+function syncNorm(row,fields){var o={};fields.forEach(function(f){o[f]=syncStr(row[f]);});return o;}
+function syncFields(t){return t==="bt"?["key","meal","due","ord","status","done","how","kept","miss"]:t==="od"?["date","days","total","source","event","event_note"]:t==="rt"?["meal","rating"]:["date","meal","trade_from","trade_to"];}
+function syncMap(rows,t,idf){var m={};(rows||[]).forEach(function(x){var n=syncNorm(x,syncFields(t));var id=idf(n);if(id&&id!=="|"&&!(id in m))m[id]=n;});return m;}
+function syncBase(){try{return JSON.parse(LS("mealSyncBase","null"));}catch(e){return null;}}
+function syncMerge(base,local,remoteRows,t,idf){
+ var rm={};(remoteRows||[]).forEach(function(x){var id=idf(syncNorm(x,syncFields(t)));if(id&&id!=="|"&&!(id in rm)){var full={};Object.keys(x).forEach(function(k){full[k]=syncStr(x[k]);});rm[id]=full;}});
+ var out={},changed=false,ids={};
+ Object.keys(rm).forEach(function(id){out[id]=rm[id];});
+ Object.keys(base).concat(Object.keys(local)).forEach(function(id){ids[id]=1;});
+ Object.keys(ids).forEach(function(id){
+  var b=base[id],l=local[id];
+  if(JSON.stringify(b)===JSON.stringify(l))return; // this device did not touch it
+  if(l===undefined){if(id in out){delete out[id];changed=true;}return;}
+  var r=out[id]?syncNorm(out[id],syncFields(t)):undefined;
+  if(JSON.stringify(r)!==JSON.stringify(l)){out[id]=Object.assign({},out[id]||{},l);changed=true;}
+ });
+ return {rows:Object.keys(out).map(function(id){return out[id];}),changed:changed};
 }
-function syncApply(r,merge){
+function syncRun(){
+ if(!syncKey())return Promise.resolve(false);
+ if(syncRunning){syncAgain=true;return Promise.resolve(false);}
+ syncRunning=true;syncPulledAt=Date.now();syncState.busy=true;syncBadge();
+ var finish=function(v){syncRunning=false;syncState.busy=false;syncBadge();if(syncAgain){syncAgain=false;setTimeout(syncRun,200);}return v;};
+ return syncPost({read:true}).then(function(r){
+  if(r&&r.error==="bad token"){try{localStorage.removeItem("kitchenKey");}catch(e){}syncState.err="bad key";finish(false);viewWeek();return false;}
+  if(!r||!r.ok){syncState.err=(r&&r.error)||"no answer";return finish(false);}
+  var lr=syncRows(),merged={},anyLocal=false;
+  var base=syncBase();
+  if(!base){
+   base={bt:{},od:{},rt:{},sw:{},budget:null};
+   // already connected under the old sync: treat this device as up to date and take the Sheet as it is
+   if(LS("mealSyncAt","")){SYNC_TABS.forEach(function(s){base[s[0]]=syncMap(lr[s[0]],s[0],s[2]);});base.budget=String(getBudget());}
+  }
+  SYNC_TABS.forEach(function(s){
+   var t=s[0],idf=s[2];
+   var res=syncMerge(base[t]||{},syncMap(lr[t],t,idf),r[s[1]],t,idf);
+   merged[s[1]]=res.rows;if(res.changed)anyLocal=true;
+  });
+  var st={};(r.Settings||[]).forEach(function(x){st[x.key]=syncStr(x.value);});
+  var myBudget=String(getBudget()),budgetLocal=base.budget!==null&&base.budget!==undefined&&base.budget!==myBudget;
+  if(budgetLocal)anyLocal=true;
+  // purchase dates: push only the ones this device has newer than the Sheet
+  var rItems={};(r.Items||[]).forEach(function(x){rItems[x.id]=syncStr(x.last_bought);});
+  var newer=Object.keys(bought).filter(function(id){return bought[id]&&(!rItems[id]||bought[id]>rItems[id]);}).map(function(id){return {id:id,last_bought:bought[id],last_src:"app"};});
+  if(newer.length)anyLocal=true;
+  var batchNewer=lastBatch&&(!st.batch_last||lastBatch>st.batch_last);if(batchNewer)anyLocal=true;
+  syncApply({Items:r.Items,Bought:merged.Bought,Orders:merged.Orders,Ratings:merged.Ratings,Swaps:merged.Swaps,Settings:budgetLocal?(r.Settings||[]).filter(function(x){return x.key!=="budget";}):r.Settings});
+  var saveBase=function(){var nr=syncRows(),nb={budget:String(getBudget())};SYNC_TABS.forEach(function(s){nb[s[0]]=syncMap(nr[s[0]],s[0],s[2]);});syncRaw("mealSyncBase",JSON.stringify(nb));};
+  var done=function(stamp){saveBase();syncRaw("mealSyncAt",stamp);syncState.last=new Date().toISOString();syncState.err=null;viewTonight();viewShop();viewWeek();return finish(true);};
+  if(!anyLocal)return done(st.updated_at||"");
+  var now=new Date().toISOString();
+  return syncPost({who:"app",ops:[
+   {tab:"Items",mode:"upsert",key:"id",rows:newer},
+   {tab:"Bought",mode:"replace",rows:merged.Bought},
+   {tab:"Orders",mode:"replace",rows:merged.Orders},
+   {tab:"Ratings",mode:"replace",rows:merged.Ratings},
+   {tab:"Swaps",mode:"replace",rows:merged.Swaps},
+   {tab:"Settings",mode:"upsert",key:"key",rows:[{key:"updated_at",value:now},{key:"updated_by",value:"app"},{key:"batch_last",value:lastBatch||st.batch_last||""},{key:"budget",value:myBudget}]}
+  ]}).then(function(res){if(res&&res.ok)return done(now);syncState.err=(res&&res.error)||"no answer";return finish(false);});
+ }).catch(function(){syncState.err="offline";return finish(false);});
+}
+function syncPush(){return syncRun();}
+function syncPull(){return syncRun();}
+function syncApply(r){
  syncSuppress=true;
- var st={};(r.Settings||[]).forEach(function(x){st[x.key]=x.value;});
+ var st={};(r.Settings||[]).forEach(function(x){st[x.key]=syncStr(x.value);});
  // purchase dates: always keep the newest date for each item
- (r.Items||[]).forEach(function(x){if(x.last_bought&&(!bought[x.id]||x.last_bought>bought[x.id]))bought[x.id]=x.last_bought;});
+ (r.Items||[]).forEach(function(x){var lb=syncStr(x.last_bought);if(lb&&(!bought[x.id]||lb>bought[x.id]))bought[x.id]=lb;});
  SS("mealBought",JSON.stringify(bought));
- var rp=(r.Bought||[]).map(function(x){var p={m:x.meal,due:x.due,ord:x.ord};if(x.status&&x.status!=="open"){p.done=x.done;p.how=x.how||x.status;}if(x.kept)p.kept=1;if(x.miss)p.miss=x.miss;return p;});
- if(!merge||rp.length){
-  if(merge){var have={};rp.forEach(function(p){have[p.m+"|"+p.due+"|"+p.ord]=1;});pantry.forEach(function(p){if(!have[p.m+"|"+p.due+"|"+p.ord])rp.push(p);});}
-  pantry=rp;SS("mealPantry",JSON.stringify(pantry));
- }
- var rh=(r.Orders||[]).map(function(x){var o={d:x.date,days:+x.days||7,t:+x.total||0};if(x.source&&x.source!=="app")o.src=x.source;if(x.event)o.ev=x.event;if(x.event_note)o.en=x.event_note;return o;});
- if(!merge||rh.length){
-  if(merge){var hd={};rh.forEach(function(o){hd[o.d]=1;});history.forEach(function(o){if(!hd[o.d])rh.push(o);});rh.sort(function(a,b){return a.d<b.d?-1:1;});}
-  history=rh;SS("mealHistory",JSON.stringify(history));
- }
- var rr={};(r.Ratings||[]).forEach(function(x){rr[x.meal]=x.rating;});
- if(merge)Object.keys(ratings).forEach(function(m){if(!(m in rr))rr[m]=ratings[m];});
+ pantry=(r.Bought||[]).map(function(x){x=syncNorm(x,syncFields("bt"));var p={m:x.meal,due:x.due,ord:x.ord};if(x.status&&x.status!=="open"){p.done=x.done;p.how=x.how||x.status;}if(x.kept)p.kept=1;if(x.miss)p.miss=x.miss;return p;});
+ SS("mealPantry",JSON.stringify(pantry));
+ history=(r.Orders||[]).map(function(x){x=syncNorm(x,syncFields("od"));var o={d:x.date,days:+x.days||7,t:+x.total||0};if(x.source&&x.source!=="app")o.src=x.source;if(x.event)o.ev=x.event;if(x.event_note)o.en=x.event_note;return o;}).sort(function(a,b){return a.d<b.d?-1:1;});
+ SS("mealHistory",JSON.stringify(history));
+ var rr={};(r.Ratings||[]).forEach(function(x){rr[syncStr(x.meal)]=syncStr(x.rating);});
  ratings=rr;SS("mealRatings",JSON.stringify(ratings));
- var rs={},rtr={};(r.Swaps||[]).forEach(function(x){rs[x.date]=x.meal;if(x.trade_from)rtr[x.date]={m:x.meal,cur:x.trade_to,fd:x.trade_from,had:true};});
- if(merge){Object.keys(swaps).forEach(function(d){if(!(d in rs)){rs[d]=swaps[d];if(trades[d])rtr[d]=trades[d];}});}
+ var rs={},rtr={};(r.Swaps||[]).forEach(function(x){x=syncNorm(x,syncFields("sw"));rs[x.date]=x.meal;if(x.trade_from)rtr[x.date]={m:x.meal,cur:x.trade_to,fd:x.trade_from,had:true};});
  swaps=rs;trades=rtr;SS("mealSwaps",JSON.stringify(swaps));SS("mealTrades",JSON.stringify(trades));
  if(st.batch_last&&(!lastBatch||st.batch_last>lastBatch)){lastBatch=st.batch_last;SS("mealBatch",lastBatch);}
- if(st.budget&&+st.budget>0&&!merge)SS("mealBudget",st.budget);
+ if(st.budget&&+st.budget>0)SS("mealBudget",st.budget);
  syncSuppress=false;
-}
-function syncPull(force){
- if(!syncKey())return Promise.resolve(false);
- syncPulledAt=Date.now();syncState.busy=true;syncBadge();
- return syncPost({read:true}).then(function(r){
-  syncState.busy=false;
-  if(r&&r.error==="bad token"){try{localStorage.removeItem("kitchenKey");}catch(e){}syncState.busy=false;syncState.err="bad key";viewWeek();return false;}
-  if(!r||!r.ok){syncState.err=(r&&r.error)||"no answer";syncBadge();return false;}
-  var st={};(r.Settings||[]).forEach(function(x){st[x.key]=x.value;});
-  var remote=st.updated_at||"",local=LS("mealSyncAt","");
-  if(!local){ // first connect on this device: merge both sides, then save the result to the Sheet
-   syncApply(r,true);syncPush();viewTonight();viewShop();viewWeek();return true;
-  }
-  if(remote&&remote>local){syncApply(r,false);syncRaw("mealSyncAt",remote);syncState.last=remote;syncState.err=null;viewTonight();viewShop();viewWeek();return true;}
-  if(local>remote||force)syncPush();
-  syncState.err=null;syncBadge();return false;
- }).catch(function(){syncState.busy=false;syncState.err="offline";syncBadge();return false;});
 }
 function syncCard(){
  var c=document.createElement("div");c.className="card";
@@ -1062,6 +1092,7 @@ function syncCard(){
 
 function viewTonight(){
  var el=document.getElementById("v-tonight");el.innerHTML="";
+ if(!syncKey()){var nc=document.createElement("div");nc.className="card";nc.style.borderColor="var(--green)";nc.innerHTML='<div class="label">Not syncing</div><div style="font-size:14px;">This device is not connected to the Google Sheet, so what you check off here stays on this device. Open the Week tab and type the Sheet key in the Google Sheet card.</div>';el.appendChild(nc);}
  var meal=mealFor(today);var info=D[meal]||{};
  var tom=new Date(today);tom.setDate(tom.getDate()+1);
  var tmeal=mealFor(tom);var tinfo=D[tmeal]||{};
