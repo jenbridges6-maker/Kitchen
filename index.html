@@ -1007,6 +1007,13 @@ function syncNorm(row,fields){var o={};fields.forEach(function(f){o[f]=syncStr(r
 function syncFields(t){return t==="bt"?["key","meal","due","ord","status","done","how","kept","miss"]:t==="od"?["date","days","total","source","event","event_note"]:t==="rt"?["meal","rating"]:["date","meal","trade_from","trade_to"];}
 function syncMap(rows,t,idf){var m={};(rows||[]).forEach(function(x){var n=syncNorm(x,syncFields(t));var id=idf(n);if(id&&id!=="|"&&!(id in m))m[id]=n;});return m;}
 function syncBase(){try{return JSON.parse(LS("mealSyncBase","null"));}catch(e){return null;}}
+function syncCanDelete(t,row){
+ // Rows only leave the Sheet for real reasons: undo of today's order, or old finished meals aging out.
+ var ti=iso(today);
+ if(t==="bt")return row.ord===ti||(!!row.done&&dbet(fromIso(row.done),today)>30);
+ if(t==="od")return row.date===ti;
+ return true;
+}
 function syncMerge(base,local,remoteRows,t,idf){
  var rm={};(remoteRows||[]).forEach(function(x){var id=idf(syncNorm(x,syncFields(t)));if(id&&id!=="|"&&!(id in rm)){var full={};Object.keys(x).forEach(function(k){full[k]=syncStr(x[k]);});rm[id]=full;}});
  var out={},changed=false,ids={};
@@ -1015,7 +1022,7 @@ function syncMerge(base,local,remoteRows,t,idf){
  Object.keys(ids).forEach(function(id){
   var b=base[id],l=local[id];
   if(JSON.stringify(b)===JSON.stringify(l))return; // this device did not touch it
-  if(l===undefined){if(id in out){delete out[id];changed=true;}return;}
+  if(l===undefined){if(id in out&&syncCanDelete(t,syncNorm(out[id],syncFields(t)))){delete out[id];changed=true;}return;}
   var r=out[id]?syncNorm(out[id],syncFields(t)):undefined;
   if(JSON.stringify(r)!==JSON.stringify(l)){out[id]=Object.assign({},out[id]||{},l);changed=true;}
  });
@@ -1029,6 +1036,7 @@ function syncRun(){
  return syncPost({read:true}).then(function(r){
   if(r&&r.error==="bad token"){try{localStorage.removeItem("kitchenKey");}catch(e){}syncState.err="bad key";finish(false);viewWeek();return false;}
   if(!r||!r.ok){syncState.err=(r&&r.error)||"no answer";return finish(false);}
+  if(!["Items","Bought","Orders","Ratings","Swaps","Settings"].every(function(k){return Array.isArray(r[k]);})||!r.Items.length){syncState.err="Sheet did not load fully";return finish(false);}
   var lr=syncRows(),merged={},anyLocal=false,snap=function(){return JSON.stringify([syncRows(),bought,String(getBudget()),lastBatch||""]);},before=snap();
   var base=syncBase();
   if(!base){
@@ -1049,6 +1057,8 @@ function syncRun(){
   var newer=Object.keys(bought).filter(function(id){return bought[id]&&(!rItems[id]||bought[id]>rItems[id]);}).map(function(id){return {id:id,last_bought:bought[id],last_src:"app"};});
   if(newer.length)anyLocal=true;
   var batchNewer=lastBatch&&(!st.batch_last||lastBatch>st.batch_last);if(batchNewer)anyLocal=true;
+  var wipe=SYNC_TABS.some(function(s){return (r[s[1]]||[]).length>=3&&!(merged[s[1]]||[]).length;});
+  if(wipe){syncState.err="blocked a write that would empty the Sheet";return finish(false);}
   syncApply({Items:r.Items,Bought:merged.Bought,Orders:merged.Orders,Ratings:merged.Ratings,Swaps:merged.Swaps,Settings:budgetLocal?(r.Settings||[]).filter(function(x){return x.key!=="budget";}):r.Settings});
   var saveBase=function(){var nr=syncRows(),nb={budget:String(getBudget())};SYNC_TABS.forEach(function(s){nb[s[0]]=syncMap(nr[s[0]],s[0],s[2]);});syncRaw("mealSyncBase",JSON.stringify(nb));};
   var done=function(stamp){saveBase();syncRaw("mealSyncAt",stamp);syncState.last=new Date().toISOString();syncState.err=null;if(snap()!==before){var y=window.scrollY;viewTonight();viewShop();viewWeek();window.scrollTo(0,y);}return finish(true);};
