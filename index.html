@@ -149,6 +149,15 @@ var FALL=[
  ["Chicken + rice casserole","Sloppy joes","Chicken chow mein","Spaghetti + meatballs","Breakfast for dinner","Baked nachos","Homemade pizza"]
 ];
 var WINTER=[
+ ["Honey garlic chicken","Sheet pan kielbasa + potatoes","Baked penne","Chicken + rice casserole","Taco soup","Homemade pizza","Taco bar"],
+ ["Chicken noodle soup","Pulled pork sandwiches","Spaghetti + meatballs","Potstickers + chicken fried rice","Chili + cornbread","Nuggets + fries + veg","Smoked lasagna"],
+ ["Chicken pot pie","Sloppy joes","Sausage + peppers","Beef stew","Chicken fajitas","Homemade pizza","Grilled burgers"],
+ ["Chicken alfredo","Meatloaf + mashed potatoes","Chicken chow mein","Baked pork chops + potatoes","Zuppa Toscana","French dip sandwiches","Chicken quesadillas"],
+ ["Cheeseburger soup","Chicken bacon ranch pasta","Beef + broccoli bowls","White chicken chili","Philly cheesesteaks","Homemade pizza","Breakfast for dinner"],
+ ["Shepherd's pie","Chicken enchiladas","Spaghetti","Chicken tortilla soup","Slow cooker pot roast","Baked potato bar","Baked nachos"]
+];
+var WINTER_CUTOVER=new Date(2026,10,20); // 6-week winter plan starts Fri Nov 20 2026
+var WINTER_OLD=[
  ["Chicken noodle soup","Spaghetti + meatballs","Chicken pot pie","Grilled burgers","Sausage + peppers","Nuggets + fries + veg","Smoked lasagna"],
  ["Baked pork chops + potatoes","Meatloaf + mashed potatoes","Chicken chow mein","Beef stew","Chicken alfredo","Taco soup","Breakfast for dinner"],
  ["Slow cooker pot roast","Chicken enchiladas","Spaghetti","Chicken tortilla soup","Chili + cornbread","Homemade pizza","Baked nachos"],
@@ -175,7 +184,7 @@ var G=[
  {id:"thyme",wid:"567535646",n:"Thyme leaves, 0.75 oz",q:1,p:2.12,s:"Spices",cad:180,flex:1},
  {id:"bay",wid:"10315300",n:"Bay leaves, 0.12 oz",q:1,p:2.98,s:"Spices",cad:365,flex:1},
  {id:"cinnamon",wid:"533272737",n:"Ground cinnamon, 2.5 oz",q:1,p:1.27,s:"Spices",cad:180,flex:1},
- {id:"fcorn",wid:"659879040",n:"Frozen whole kernel corn, 12 oz",q:1,p:0.98,s:"Frozen",cad:0,trig:["Chicken tortilla soup","Taco soup"]},
+ {id:"fcorn",wid:"659879040",n:"Frozen whole kernel corn, 12 oz",q:1,p:0.98,s:"Frozen",cad:0,trig:["Chicken tortilla soup","Taco soup","Shepherd's pie","White chicken chili"]},
  {id:"shells",wid:"1657981925",n:"Taco shells, 12 ct",q:1,p:1.5,s:"Bread",cad:0,md:1},
  {id:"bcrumb",wid:"10315089",n:"Plain bread crumbs, 15 oz",q:1,p:1.22,s:"Backstock",cad:0,trig:["Meatloaf + mashed potatoes"]},
  {id:"ketch",wid:"616064227",n:"Heinz ketchup, no sugar added",q:1,p:5.78,s:"Backstock",cad:60,flex:1},
@@ -192,7 +201,7 @@ var G=[
  {id:"pep",wid:"40495518",n:"Pepperoni, 6 oz",q:1,p:2.88,s:"Protein",cad:14,trig:["Homemade pizza"]},
  {id:"chops",wid:"20627151",n:"Pork loin chops, family pack 6 ct",q:2,p:14.45,s:"Protein",cad:0,trig:["Baked pork chops + potatoes","Grilled pork chops + salad"]},
  {id:"dogs",wid:"34632371",n:"Hot dogs, 8 ct",q:1,p:2.84,s:"Protein",cad:0,trig:["Grilled hot dogs / brats"]},
- {id:"roast",wid:"55446514",n:"Chuck roast, 2 to 2.7 lb",q:1,p:21.31,s:"Protein",cad:0,trig:["Slow cooker pot roast","Beef stew"],bw:"39944474",bn:"Angus chuck roast, 2 to 2.75 lb"},
+ {id:"roast",wid:"55446514",n:"Chuck roast, 2 to 2.7 lb",q:1,p:21.31,s:"Protein",cad:0,trig:["Slow cooker pot roast","Beef stew","French dip sandwiches"],bw:"39944474",bn:"Angus chuck roast, 2 to 2.75 lb"},
  {id:"milk",wid:"10450114",n:"Whole milk, gallon",q:1,p:3.80,s:"Dairy",cad:7},
  {id:"fiesta",wid:"10452468",n:"Fiesta shredded cheese, 32 oz",q:1,p:6.92,s:"Dairy",cad:21},
  {id:"mozz",wid:"10452490",n:"Mozzarella shredded, 16 oz",q:1,p:3.48,s:"Dairy",cad:21},
@@ -201,7 +210,7 @@ var G=[
  {id:"sour",wid:"12335111",n:"Sour cream, 16 oz",q:1,p:1.84,s:"Dairy",cad:21},
  {id:"butter",wid:"132893363",n:"Butter, 16 oz",q:1,p:3.06,s:"Dairy",cad:21},
  {id:"slices",wid:"15077514",n:"Cheese slices, sharp cheddar",q:2,p:1.67,s:"Dairy",cad:28},
- {id:"ched",wid:"10452477",n:"Sharp cheddar shredded, 16 oz",q:1,p:3.48,s:"Dairy",cad:45},
+ {id:"ched",md:1,wid:"10452477",n:"Sharp cheddar shredded, 16 oz",q:1,p:3.48,s:"Dairy",cad:45},
  {id:"parm",wid:"10452414",n:"Parmesan shredded, 6 oz",q:1,p:2.08,s:"Dairy",cad:45},
  {id:"ric",wid:"10316631",n:"Ricotta, 15 oz",q:1,p:2.67,s:"Dairy",cad:0,trig:["Baked penne"]},
  {id:"onion",wid:"10447842",n:"Yellow onions, 3 lb",q:1,p:3.13,s:"Produce",cad:28},
@@ -209,21 +218,21 @@ var G=[
  {id:"gbell",wid:"44390945",n:"Green bell pepper",q:1,p:0.86,s:"Produce",cad:14,trig:["Homemade pizza"]},
  {id:"mush",wid:"10449184",n:"Sliced mushrooms, 8 oz",q:1,p:2,s:"Produce",cad:14,trig:["Homemade pizza"],md:1},
  {id:"carrot",wid:"44391001",n:"Carrot chips, 1 lb",q:1,p:2.07,s:"Produce",cad:21},
- {id:"celery",wid:"51259411",n:"Celery",q:1,p:2.37,s:"Produce",cad:0,trig:["Beef stew","Chicken noodle soup","Chicken pot pie"]},
- {id:"slaw",wid:"16785076",n:"Coleslaw mix, 16 oz",q:1,p:1.97,s:"Produce",cad:0,trig:["Chicken chow mein"]},
+ {id:"celery",wid:"51259411",n:"Celery",q:1,p:2.37,s:"Produce",cad:0,trig:["Beef stew","Chicken noodle soup","Chicken pot pie","Cheeseburger soup"]},
+ {id:"slaw",wid:"16785076",n:"Coleslaw mix, 16 oz",q:1,p:1.97,s:"Produce",cad:0,trig:["Chicken chow mein","Pulled pork sandwiches"]},
  {id:"cil",wid:"160597260",n:"Cilantro bunch",q:1,p:0.93,s:"Produce",cad:0,md:1},
  {id:"salad",wid:"19400285",n:"Romaine salad blend, 18 oz",q:1,p:5.42,s:"Produce",cad:10,md:1},
  {id:"spin",wid:"13893738",n:"Spinach, 10 oz",q:1,p:2,s:"Produce",cad:45,md:1},
  {id:"cuke",wid:"44419690",n:"Mini cucumbers, 16 oz",q:1,p:2.08,s:"Produce",cad:7},
  {id:"tom",wid:"44390955",n:"Tomatoes on the vine",q:1,p:3.76,s:"Produce",cad:0,md:1},
  {id:"corn",wid:"44391430",n:"Sweet corn on the cob",q:6,p:0.33,s:"Produce",cad:7,sn:"summer"},
- {id:"pot",wid:"10447837",n:"Russet potatoes, 5 lb",q:1,p:2.84,s:"Produce",cad:28},
+ {id:"pot",md:1,wid:"10447837",n:"Russet potatoes, 5 lb",q:1,p:2.84,s:"Produce",cad:28},
  {id:"avo",wid:"44390968",n:"Avocados, 5-6 ct bag",q:1,p:3.48,s:"Produce",cad:21,md:1},
  {id:"ban",wid:"44390948",n:"Bananas",q:6,p:0.2,s:"Produce",cad:10},
  {id:"apple",wid:"44390958",n:"Gala apples, 3 lb",q:1,p:3.24,s:"Produce",cad:14},
  {id:"grape",wid:"47770140",n:"Red seedless grapes",q:1,p:4.21,s:"Produce",cad:7},
  {id:"straw",wid:"22660282",n:"Strawberries, 2 lb",q:1,p:4.72,s:"Produce",cad:21},
- {id:"broc",wid:"745725724",n:"Broccoli florets, 32 oz",q:1,p:2.88,s:"Frozen",cad:14},
+ {id:"broc",md:1,wid:"745725724",n:"Broccoli florets, 32 oz",q:1,p:2.88,s:"Frozen",cad:14},
  {id:"peas",wid:"443429457",n:"Sweet peas, 12 oz",q:1,p:0.98,s:"Frozen",cad:28},
  {id:"gbean",wid:"872271913",n:"Green beans, 12 oz",q:1,p:1.97,s:"Frozen",cad:28},
  {id:"fries",wid:"10534214",n:"Fries, 32 oz",q:1,p:2.97,s:"Frozen",cad:45},
@@ -235,7 +244,7 @@ var G=[
  {id:"lasg",wid:"24107864",n:"Frozen lasagna, 90 oz",q:1,p:14.87,s:"Frozen",cad:0,trig:["Smoked lasagna"]},
  {id:"mball",wid:"54479594",n:"Frozen meatballs, 48 oz",q:1,p:11.47,s:"Frozen",cad:0,trig:["Spaghetti + meatballs"]},
  {id:"pstick",wid:"33426037",n:"Chicken potstickers, 46.5 oz",q:1,p:12.46,s:"Frozen",cad:0,trig:["Potstickers + chicken fried rice"]},
- {id:"gbread",wid:"10533811",n:"Garlic bread, 16 oz",q:1,p:2.67,s:"Frozen",cad:0,trig:["Spaghetti + meatballs","Smoked lasagna"]},
+ {id:"gbread",wid:"10533811",n:"Garlic bread, 16 oz",q:1,p:2.67,s:"Frozen",cad:0,trig:["Spaghetti + meatballs","Smoked lasagna","Zuppa Toscana"]},
  {id:"pasta",wid:"10534084",n:"Penne pasta, 16 oz",q:1,p:1.24,s:"Pantry",cad:21},
  {id:"spag",wid:"10534115",n:"Spaghetti, 16 oz",q:1,p:1.24,s:"Pantry",cad:21},
  {id:"rice",wid:"10315395",n:"Long grain rice, 5 lb",q:1,p:3.37,s:"Pantry",cad:28},
@@ -253,11 +262,11 @@ var G=[
  {id:"kid",wid:"10534045",n:"Kidney beans, 15.5 oz",q:2,p:0.86,s:"Pantry",cad:0,trig:["Chili + cornbread","Taco soup"]},
  {id:"tsauce",wid:"10415500",n:"Tomato sauce, 15 oz",q:2,p:0.92,s:"Pantry",cad:0,trig:["Chili + cornbread","Sloppy joes"]},
  {id:"cbread",wid:"10448133",n:"Jiffy corn muffin mix",q:2,p:0.72,s:"Pantry",cad:0,trig:["Chili + cornbread"]},
- {id:"bbroth",wid:"10899014",n:"Beef broth, 32 oz",q:2,p:1.50,s:"Pantry",cad:0,trig:["Slow cooker pot roast","Beef stew"]},
- {id:"cbroth",wid:"10899013",n:"Chicken broth, 32 oz",q:2,p:1.50,s:"Pantry",cad:0,trig:["Chicken tortilla soup","Chicken noodle soup","Chicken pot pie","Chicken + rice casserole","Taco soup"]},
+ {id:"bbroth",wid:"10899014",n:"Beef broth, 32 oz",q:2,p:1.50,s:"Pantry",cad:0,trig:["Slow cooker pot roast","Beef stew","French dip sandwiches","Shepherd's pie"]},
+ {id:"cbroth",wid:"10899013",n:"Chicken broth, 32 oz",q:2,p:1.50,s:"Pantry",cad:0,trig:["Chicken tortilla soup","Chicken noodle soup","Chicken pot pie","Chicken + rice casserole","Taco soup","White chicken chili","Cheeseburger soup","Zuppa Toscana"]},
  {id:"bread",wid:"10804551",n:"Whole wheat bread, 20 oz",q:1,p:1.97,s:"Bread",cad:7},
- {id:"ftort",wid:"10535374",n:"Flour tortillas, 12 ct",q:1,p:2.68,s:"Bread",cad:14},
- {id:"hbun",wid:"10450104",n:"Hamburger buns, 8 ct",q:1,p:1.48,s:"Bread",cad:14},
+ {id:"ftort",md:1,wid:"10535374",n:"Flour tortillas, 12 ct",q:1,p:2.68,s:"Bread",cad:14},
+ {id:"hbun",md:1,wid:"10450104",n:"Hamburger buns, 8 ct",q:1,p:1.48,s:"Bread",cad:14},
  {id:"dbun",wid:"10450133",n:"Hot dog buns, 8 ct",q:1,p:1.48,s:"Bread",cad:0,trig:["Grilled hot dogs / brats","Grilled brats + veg"]},
  {id:"ctort",wid:"14140865",n:"Corn tortillas, 30 ct",q:1,p:2.48,s:"Bread",cad:14},
  {id:"bisc",wid:"10448401",n:"Biscuits, 8 ct",q:1,p:1.96,s:"Bread",cad:0,trig:["Breakfast for dinner","Chicken pot pie"]},
@@ -278,7 +287,7 @@ var G=[
  {id:"soy",wid:"15056122",n:"Soy sauce, 15 oz",q:1,p:1.76,s:"Backstock",cad:45,flex:1},
  {id:"sesame",wid:"145525537",n:"Sesame oil, 8.45 oz",q:1,p:5.48,s:"Backstock",cad:60,flex:1},
  {id:"ter",wid:"23598506",n:"Teriyaki sauce, 15 oz",q:1,p:3.02,s:"Backstock",cad:0,trig:["Teriyaki chicken + rice"]},
- {id:"bbq",wid:"10294611",n:"Sweet Baby Ray's BBQ, 40 oz",q:1,p:3.82,s:"Backstock",cad:35,flex:1},
+ {id:"bbq",md:1,wid:"10294611",n:"Sweet Baby Ray's BBQ, 40 oz",q:1,p:3.82,s:"Backstock",cad:35,flex:1},
  {id:"ench",wid:"24506160",n:"Enchilada sauce, 28 oz",q:1,p:3.97,s:"Backstock",cad:0,trig:["Chicken enchiladas"]},
  {id:"alf",wid:"10291084",n:"Bertolli alfredo, 15 oz",q:1,p:2.98,s:"Backstock",cad:0,trig:["Chicken alfredo"]},
  {id:"flour",wid:"122814298",n:"All-purpose flour, 10 lb",q:1,p:4.57,s:"Backstock",cad:60,flex:1},
@@ -314,16 +323,16 @@ var G=[
  {id:"snap",wid:"13399614",n:"Sugar snap peas, 8 oz",q:1,p:2.68,s:"Produce",cad:30},
  {id:"mand",wid:"11025598",n:"Mandarin oranges, 3 lb",q:1,p:4.97,s:"Produce",cad:45},
  {id:"blueb",wid:"161115457",n:"Blueberries, 18 oz",q:1,p:7.82,s:"Produce",cad:45},
- {id:"hcream",wid:"10450339",n:"Heavy whipping cream, 16 oz",q:1,p:2.96,s:"Dairy",cad:90},
+ {id:"hcream",md:1,wid:"10450339",n:"Heavy whipping cream, 16 oz",q:1,p:2.96,s:"Dairy",cad:90},
  {id:"patty",wid:"10315961",n:"Beef burger patties, 3 lb (12 ct)",q:1,p:15.97,s:"Frozen",cad:30,bw:"358227780",bn:"Angus burger patties, 12 ct"},
  {id:"shellch",wid:"128013930",n:"Shells and cheese, 7.25 oz",q:1,p:0.68,s:"Pantry",cad:45},
  {id:"mash",wid:"39778487",n:"Idahoan mashed potatoes, family size",q:1,p:2.88,s:"Pantry",cad:45},
- {id:"srolls",wid:"773610873",n:"French steak rolls, 24 ct",q:1,p:5.97,s:"Bread",cad:45},
+ {id:"srolls",md:1,wid:"773610873",n:"French steak rolls, 24 ct",q:1,p:5.97,s:"Bread",cad:45},
  {id:"brownie",wid:"16777540",n:"Little Debbie Cosmic Brownies",q:1,p:3.18,s:"Breakfast & Snacks",cad:21,flex:1},
  {id:"rkt",wid:"10818666",n:"Rice Krispies Treats",q:1,p:4.96,s:"Breakfast & Snacks",cad:21,flex:1},
  {id:"goldf",wid:"253680066",n:"Goldfish, 20 ct",q:1,p:8.76,s:"Breakfast & Snacks",cad:60,flex:1},
  {id:"tsaus",wid:"868677321",n:"Turkey sausage sticks",q:1,p:3.97,s:"Breakfast & Snacks",cad:60,flex:1},
- {id:"honey",wid:"433628197",n:"Raw honey, 16 oz",q:1,p:5.97,s:"Backstock",cad:35,flex:1},
+ {id:"honey",md:1,wid:"433628197",n:"Raw honey, 16 oz",q:1,p:5.97,s:"Backstock",cad:35,flex:1},
  {id:"stevia",wid:"42279263",n:"Liquid stevia, 1.68 oz",q:1,p:3.52,s:"Backstock",cad:60,flex:1},
  {id:"mayo",wid:"17056888",n:"Mayonnaise, 30 oz",q:1,p:2.97,s:"Backstock",cad:60,flex:1},
  {id:"pickle",wid:"10290692",n:"Dill pickle spears, 24 oz",q:1,p:2.77,s:"Backstock",cad:90,flex:1},
@@ -334,7 +343,18 @@ var G=[
  {id:"tpaste",wid:"1671708041",n:"Colgate Bluey kids toothpaste",q:1,p:2.48,s:"Household",cad:45,flex:1},
  {id:"hsoap",wid:"144632103",n:"Equate aloe hand soap, 7.5 oz",q:3,p:0.97,s:"Household",cad:120,flex:1},
  {id:"strash",wid:"213660062",n:"Small trash bags, 4 gal 40 ct",q:1,p:2.58,s:"Household",cad:40},
- {id:"sbag",wid:"2471694270",n:"Sandwich bags, 100 ct",q:1,p:2.28,s:"Household",cad:60,flex:1}
+ {id:"sbag",wid:"2471694270",n:"Sandwich bags, 100 ct",q:1,p:2.28,s:"Household",cad:60,flex:1},
+ {id:"rseas",wid:"187211086",n:"Ranch seasoning packet, 1 oz",q:1,p:0.68,s:"Backstock",cad:0,trig:["Chicken bacon ranch pasta"]},
+ {id:"worc",wid:"12157940",n:"Worcestershire sauce, 10 oz",q:1,p:1,s:"Backstock",cad:120},
+ {id:"onsoup",wid:"10307791",n:"Lipton onion soup mix, 2 ct",q:1,p:2.18,s:"Backstock",cad:0,trig:["French dip sandwiches"]},
+ {id:"prov",wid:"10451510",n:"Provolone slices, 8 oz",q:2,p:1.78,s:"Dairy",cad:0,trig:["French dip sandwiches","Philly cheesesteaks"]},
+ {id:"pshoul",wid:"706550646",n:"Pork shoulder roast, boneless",q:1,p:24.06,s:"Protein",cad:0,trig:["Pulled pork sandwiches"]},
+ {id:"gnb",wid:"10534042",n:"Great northern beans, 15.5 oz",q:3,p:0.92,s:"Pantry",cad:0,trig:["White chicken chili"]},
+ {id:"gchile",wid:"10415222",n:"Diced green chiles, 4 oz",q:2,p:0.93,s:"Pantry",cad:0,trig:["White chicken chili"]},
+ {id:"ccheese",wid:"10452429",n:"Cream cheese, 8 oz",q:1,p:1.56,s:"Dairy",cad:0,trig:["White chicken chili"]},
+ {id:"phil",wid:"5212491375",n:"Steak-umm sliced steaks, 27 oz",q:1,p:10.84,s:"Frozen",cad:0,trig:["Philly cheesesteaks"],bw:"23810466",bn:"Great Value Philly steak, 14 oz (buy 2)"},
+ {id:"bsugar",wid:"10315012",n:"Light brown sugar, 32 oz",q:1,p:2.08,s:"Backstock",cad:120},
+ {id:"cstarch",wid:"664106906",n:"Corn starch, 16 oz",q:1,p:1.97,s:"Backstock",cad:180}
 ];
 var D={
 "Chicken bacon ranch wraps":{db:"Thaw diced chicken",mo:"",st:"5:30 PM",hd:"30 min"},
@@ -374,7 +394,20 @@ var D={
 "Chicken pot pie":{db:"Thaw chicken",mo:"",st:"5:05 PM",hd:"25 min + 25 bake"},
 "Meatloaf + mashed potatoes":{db:"",mo:"",st:"4:55 PM",hd:"20 min + 50 bake"},
 "Taco soup":{db:"",mo:"",st:"5:15 PM",hd:"15 min + 25 simmer"},
-"Nuggets + fries + veg":{db:"",mo:"",st:"5:30 PM",hd:"10 min + 20 bake"}
+"Nuggets + fries + veg":{db:"",mo:"",st:"5:30 PM",hd:"10 min + 20 bake"},
+"Chicken bacon ranch pasta":{db:"Thaw diced chicken",mo:"",st:"5:20 PM",hd:"35 min"},
+"Shepherd's pie":{db:"",mo:"Optional: peel and cube the potatoes, cover with water, and refrigerate",st:"5:00 PM",hd:"35 min + 20 bake"},
+"French dip sandwiches":{db:"Thaw the roast if frozen",mo:"Load the crockpot by 9 AM, 8 hr low",st:"Crockpot on by 9 AM",hd:"10 min morning + 20 min at dinner"},
+"Pulled pork sandwiches":{db:"Thaw the pork shoulder if frozen",mo:"Rub and load the crockpot by 8 AM, 9 to 10 hr low",st:"Crockpot on by 8 AM",hd:"10 min morning + 20 min at dinner"},
+"Baked potato bar":{db:"",mo:"",st:"5:10 PM",hd:"15 min + 40 bake"},
+"White chicken chili":{db:"Thaw diced chicken",mo:"",st:"5:15 PM",hd:"15 min + 25 simmer"},
+"Chicken quesadillas":{db:"Thaw diced chicken",mo:"",st:"5:20 PM",hd:"35 min"},
+"Philly cheesesteaks":{db:"",mo:"",st:"5:25 PM",hd:"30 min"},
+"Sheet pan kielbasa + potatoes":{db:"",mo:"",st:"5:10 PM",hd:"15 min + 45 roast"},
+"Beef + broccoli bowls":{db:"",mo:"",st:"5:25 PM",hd:"30 min"},
+"Cheeseburger soup":{db:"",mo:"",st:"5:15 PM",hd:"20 min + 25 simmer"},
+"Honey garlic chicken":{db:"Thaw chicken thighs if frozen",mo:"Load the crockpot by 11 AM, 6 hr low",st:"Crockpot on by 11 AM",hd:"10 min morning + 20 min at dinner"},
+"Zuppa Toscana":{db:"",mo:"",st:"5:15 PM",hd:"15 min + 25 simmer"}
 };
 var RECIPE={
 "Chicken bacon ranch wraps":{"serves":6,"ing":[{"a":1,"u":"lb","n":"bacon","g":"bacon"},{"a":2,"u":"lb","n":"diced chicken breast","g":"diced"},{"a":1,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":1,"u":"tsp","n":"smoked paprika","g":"paprika"},{"a":0.5,"u":"tsp","n":"salt","g":"salt"},{"a":0.25,"u":"tsp","n":"black pepper","g":"pepper"},{"a":12,"u":"","n":"flour tortillas","g":"ftort"},{"a":6,"u":"cup","n":"romaine salad blend","g":"salad"},{"a":2,"u":"","n":"tomatoes, diced","g":"tom"},{"a":2,"u":"cup","n":"shredded sharp cheddar","g":"ched"},{"a":0.75,"u":"cup","n":"ranch dressing","g":"ranch"}],"steps":["Cook the bacon in a large skillet over medium heat until crisp, about 12 minutes. Drain on a paper towel and crumble. Pour off all but 1 tablespoon of the grease.","Add the diced chicken to the same skillet over medium high heat. Season with garlic powder, smoked paprika, salt, and pepper. Cook 10 to 12 minutes, stirring now and then, until hot through and browned.","Take the pan off the heat and toss the chicken with half the ranch.","Warm the tortillas in the microwave, 6 at a time, about 20 seconds under a damp paper towel.","Set everything out: chicken, bacon, lettuce, tomato, cheddar, and the rest of the ranch. Everyone builds their own wrap."]},
@@ -414,7 +447,20 @@ var RECIPE={
 "Chicken pot pie":{serves:6,ing:[{a:2,u:"lb",n:"diced chicken breast",g:"diced"},{a:1,u:"can",n:"biscuits",g:"bisc"},{a:4,u:"tbsp",n:"butter",g:"butter"},{a:0.33,u:"cup",n:"flour",g:"flour"},{a:3,u:"cup",n:"chicken broth",g:"cbroth"},{a:1,u:"cup",n:"milk",g:"milk"},{a:2,u:"cup",n:"sweet peas",g:"peas"},{a:2,u:"cup",n:"carrots, diced",g:"carrot"},{a:3,u:"stalk",n:"celery, diced",g:"celery"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:1,u:"tsp",n:"thyme",g:"thyme"},{a:1,u:"tsp",n:"garlic powder",g:"garpow"},{a:1.5,u:"tsp",n:"salt",g:"salt"},{a:1,u:"tsp",n:"black pepper",g:"pepper"}],steps:["Thaw the chicken and cook it through in a skillet. Set it aside.","Melt the butter in a large pot. Cook the carrots, celery, and onion 6 min.","Stir in the flour and cook 1 min. This is the roux that thickens everything.","Whisk in the broth and milk. Add the thyme, garlic powder, salt, and pepper. Simmer until it thickens, 5 min.","Stir in the chicken and peas. Pour into a 9x13 and top with the biscuits.","Bake at 375 F for 25 min until the biscuits are golden and cooked through."]},
 "Meatloaf + mashed potatoes":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"cup",n:"bread crumbs",g:"bcrumb"},{a:2,u:"",n:"eggs",g:"eggs"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:0.5,u:"cup",n:"ketchup",g:"ketch"},{a:3,u:"lb",n:"potatoes",g:"pot"},{a:4,u:"tbsp",n:"butter",g:"butter"},{a:0.5,u:"cup",n:"milk",g:"milk"},{a:3,u:"cup",n:"green beans",g:"gbean"},{a:1,u:"tsp",n:"garlic powder",g:"garpow"},{a:1,u:"tsp",n:"onion powder",g:"onionpow"},{a:1,u:"tsp",n:"Italian seasoning",g:"italsn"},{a:2,u:"tsp",n:"salt",g:"salt"},{a:1,u:"tsp",n:"black pepper",g:"pepper"}],steps:["Mix the beef, bread crumbs, eggs, diced onion, garlic powder, onion powder, Italian seasoning, salt, and pepper. Do not overwork it or it turns dense.","Shape into a loaf on a sheet pan. Spread the ketchup over the top.","Bake at 375 F for 50 min, until the center reads 160 F.","Boil the potatoes 20 min until fork tender. Mash with the butter and milk.","Steam the green beans.","Rest the meatloaf 10 min before slicing or it falls apart."]},
 "Taco soup":{serves:6,ing:[{a:2,u:"lb",n:"ground beef",g:"beef"},{a:1,u:"",n:"yellow onion, diced",g:"onion"},{a:1,u:"packet",n:"taco seasoning",g:"tacosn"},{a:4,u:"cup",n:"chicken broth",g:"cbroth"},{a:2,u:"can",n:"Rotel",g:"rotel"},{a:2,u:"can",n:"black beans",g:"black"},{a:2,u:"can",n:"kidney beans",g:"kid"},{a:2,u:"cup",n:"frozen corn",g:"fcorn"},{a:1,u:"bag",n:"tortilla chips",g:"chips"},{a:2,u:"cup",n:"fiesta cheese",g:"fiesta"},{a:1,u:"cup",n:"sour cream",g:"sour"},{a:1,u:"tbsp",n:"cumin",g:"cumin"},{a:1,u:"tbsp",n:"chili powder",g:"chilipow"},{a:1,u:"tsp",n:"smoked paprika",g:"paprika"},{a:1,u:"tsp",n:"salt",g:"salt"}],steps:["Brown the ground beef with the onion, drain the fat.","Add the taco seasoning, cumin, chili powder, paprika, salt, broth, Rotel, both cans of beans, and the corn.","Simmer 25 min.","Serve with chips, cheese, and sour cream on top. This one is very forgiving."]},
-"Nuggets + fries + veg":{serves:6,ing:[{a:32,u:"oz",n:"chicken nuggets",g:"nugg"},{a:32,u:"oz",n:"frozen fries",g:"fries"},{a:4,u:"cup",n:"broccoli florets",g:"broc"},{a:0.5,u:"cup",n:"ranch dressing",g:"ranch"},{a:1,u:"tsp",n:"Kinder's seasoning",g:"kinder"}],steps:["Heat the oven to 425 F.","Spread the nuggets and fries on two separate sheet pans so nothing steams.","Sprinkle the fries with the Kinder's seasoning. Bake about 20 min, flipping halfway.","Steam the broccoli.","Serve with ranch. Easy night, no guilt."]}
+"Nuggets + fries + veg":{serves:6,ing:[{a:32,u:"oz",n:"chicken nuggets",g:"nugg"},{a:32,u:"oz",n:"frozen fries",g:"fries"},{a:4,u:"cup",n:"broccoli florets",g:"broc"},{a:0.5,u:"cup",n:"ranch dressing",g:"ranch"},{a:1,u:"tsp",n:"Kinder's seasoning",g:"kinder"}],steps:["Heat the oven to 425 F.","Spread the nuggets and fries on two separate sheet pans so nothing steams.","Sprinkle the fries with the Kinder's seasoning. Bake about 20 min, flipping halfway.","Steam the broccoli.","Serve with ranch. Easy night, no guilt."]},
+"Chicken bacon ranch pasta":{"serves":6,"ing":[{"a":1,"u":"lb","n":"penne","g":"pasta"},{"a":2,"u":"lb","n":"diced chicken breast","g":"diced"},{"a":1,"u":"lb","n":"bacon","g":"bacon"},{"a":1,"u":"packet","n":"ranch seasoning","g":"rseas"},{"a":1,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":2,"u":"tbsp","n":"butter","g":"butter"},{"a":2,"u":"tbsp","n":"flour","g":"flour"},{"a":1,"u":"cup","n":"milk","g":"milk"},{"a":1,"u":"cup","n":"heavy cream","g":"hcream"},{"a":2,"u":"cup","n":"shredded sharp cheddar","g":"ched"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":4,"u":"cup","n":"broccoli florets","g":"broc"}],"steps":["Start a big pot of salted water. Cook the penne about 11 min, then drain.","While the water heats, cook the bacon in a large skillet over medium until crisp, about 12 min. Drain on a paper towel, crumble, and pour off all but 1 tablespoon of grease.","Add the diced chicken to the skillet over medium high. Sprinkle with the garlic powder and half the ranch packet. Cook 10 to 12 min until browned and hot through. Move it to a plate.","Melt the butter in the same skillet. Whisk in the flour and cook 1 min. Slowly whisk in the milk and cream. Simmer 3 min, stirring, until it thickens.","Stir in the rest of the ranch packet, the pepper, and the cheddar until melted. Add the pasta, chicken, and half the bacon and toss.","Microwave the broccoli per the bag. Serve the pasta topped with the rest of the bacon, broccoli on the side."]},
+"Shepherd's pie":{"serves":6,"ing":[{"a":3,"u":"lb","n":"russet potatoes","g":"pot"},{"a":4,"u":"tbsp","n":"butter","g":"butter"},{"a":0.75,"u":"cup","n":"milk","g":"milk"},{"a":2,"u":"lb","n":"ground beef","g":"beef"},{"a":1,"u":"","n":"yellow onion, diced","g":"onion"},{"a":1.5,"u":"cup","n":"carrot chips, chopped","g":"carrot"},{"a":2,"u":"tsp","n":"minced garlic","g":"garlic"},{"a":2,"u":"tbsp","n":"flour","g":"flour"},{"a":1,"u":"cup","n":"beef broth","g":"bbroth"},{"a":2,"u":"tbsp","n":"Worcestershire sauce","g":"worc"},{"a":2,"u":"tbsp","n":"ketchup","g":"ketch"},{"a":1,"u":"tsp","n":"thyme","g":"thyme"},{"a":1.5,"u":"cup","n":"frozen peas","g":"peas"},{"a":1,"u":"cup","n":"frozen corn","g":"fcorn"},{"a":1,"u":"cup","n":"shredded sharp cheddar","g":"ched"},{"a":1,"u":"tsp","n":"salt","g":"salt"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"}],"steps":["Heat the oven to 400 F. Peel and cube the potatoes, cover with water in a pot, and boil 15 to 18 min until fork tender.","Meanwhile brown the beef with the onion and carrots in a large skillet, 8 to 10 min. Drain the fat.","Stir in the garlic and flour and cook 1 min. Add the broth, Worcestershire, ketchup, thyme, half the salt, and the pepper. Simmer 5 min until it thickens.","Stir in the frozen peas and corn. Spread the filling in a 9x13 pan.","Drain the potatoes and mash with the butter, milk, and the rest of the salt. Spread over the filling and sprinkle with the cheddar.","Bake 20 min until the cheese is golden and the edges bubble. Let it sit 5 min before serving."]},
+"French dip sandwiches":{"serves":6,"ing":[{"a":1,"u":"","n":"chuck roast (2 to 2.7 lb)","g":"roast"},{"a":1,"u":"envelope","n":"onion soup mix","g":"onsoup"},{"a":4,"u":"cup","n":"beef broth","g":"bbroth"},{"a":1,"u":"tbsp","n":"Worcestershire sauce","g":"worc"},{"a":1,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":8,"u":"","n":"French steak rolls","g":"srolls"},{"a":12,"u":"slices","n":"provolone","g":"prov"},{"a":1,"u":"bag","n":"fries (32 oz)","g":"fries"}],"steps":["Morning: put the roast in the crockpot. Sprinkle with the onion soup mix, garlic powder, and pepper. Pour the broth and Worcestershire around it. Cook on low 8 hours.","At dinner: heat the oven for the fries and bake them per the bag.","Lift the roast out and shred or slice it thin. Skim the fat off the liquid in the crockpot. That liquid is the dipping juice.","Split the rolls and lay them open on a sheet pan. Pile on the beef and top each with provolone. Broil 1 to 2 min until the cheese melts. Watch it closely.","Serve with small cups of the hot juice for dipping and the fries on the side."]},
+"Pulled pork sandwiches":{"serves":6,"ing":[{"a":1,"u":"","n":"boneless pork shoulder (about 4 lb)","g":"pshoul"},{"a":1,"u":"","n":"yellow onion, sliced","g":"onion"},{"a":1,"u":"tbsp","n":"smoked paprika","g":"paprika"},{"a":2,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":1,"u":"tsp","n":"onion powder","g":"onionpow"},{"a":1,"u":"tsp","n":"chili powder","g":"chilipow"},{"a":1.5,"u":"tsp","n":"salt","g":"salt"},{"a":1,"u":"tsp","n":"black pepper","g":"pepper"},{"a":1.5,"u":"cup","n":"BBQ sauce","g":"bbq"},{"a":8,"u":"","n":"hamburger buns","g":"hbun"},{"a":1,"u":"bag","n":"coleslaw mix (16 oz)","g":"slaw"},{"a":0.5,"u":"cup","n":"mayonnaise","g":"mayo"},{"a":1,"u":"tbsp","n":"lime juice","g":"lime"}],"steps":["Morning: mix the paprika, garlic powder, onion powder, chili powder, 1 tsp of the salt, and the pepper. Rub it all over the pork.","Lay the sliced onion in the crockpot, set the pork on top, and add 1/2 cup water. Cook on low 9 to 10 hours.","At dinner: lift out the pork, shred it with two forks, and throw away the fat. Pour off most of the liquid, then put the meat back in and stir in the BBQ sauce. Keep it on warm 15 min.","Toss the coleslaw mix with the mayo, lime juice, and the rest of the salt.","Toast the buns. Pile on the pork and top with slaw. Leftover pork freezes well."]},
+"Baked potato bar":{"serves":6,"ing":[{"a":6,"u":"","n":"large russet potatoes","g":"pot"},{"a":1,"u":"tbsp","n":"olive oil","g":"oil"},{"a":1,"u":"tsp","n":"salt","g":"salt"},{"a":1,"u":"lb","n":"bacon","g":"bacon"},{"a":2,"u":"cup","n":"shredded sharp cheddar","g":"ched"},{"a":1,"u":"cup","n":"sour cream","g":"sour"},{"a":4,"u":"tbsp","n":"butter","g":"butter"},{"a":4,"u":"cup","n":"broccoli florets","g":"broc"},{"a":0.25,"u":"cup","n":"ranch dressing","g":"ranch"}],"steps":["Heat the oven to 425 F. Scrub the potatoes and poke each one 4 or 5 times with a fork.","Microwave them together for 8 min to get a head start. Rub with the oil and salt, then bake right on the oven rack 30 to 40 min until a fork slides in easily.","While they bake, cook the bacon until crisp and crumble it. Microwave the broccoli per the bag.","Set everything out: butter, cheddar, sour cream, bacon, broccoli, and ranch. Split the potatoes and let everyone build their own."]},
+"White chicken chili":{"serves":6,"ing":[{"a":1,"u":"tbsp","n":"olive oil","g":"oil"},{"a":1,"u":"","n":"yellow onion, diced","g":"onion"},{"a":1,"u":"tbsp","n":"minced garlic","g":"garlic"},{"a":2,"u":"lb","n":"diced chicken breast","g":"diced"},{"a":4,"u":"cup","n":"chicken broth","g":"cbroth"},{"a":3,"u":"can","n":"great northern beans, drained","g":"gnb"},{"a":2,"u":"can","n":"diced green chiles","g":"gchile"},{"a":1.5,"u":"cup","n":"frozen corn","g":"fcorn"},{"a":2,"u":"tsp","n":"cumin","g":"cumin"},{"a":1,"u":"tsp","n":"oregano","g":"oregano"},{"a":1,"u":"tsp","n":"chili powder","g":"chilipow"},{"a":1,"u":"tsp","n":"salt","g":"salt"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":8,"u":"oz","n":"cream cheese","g":"ccheese"},{"a":1,"u":"tbsp","n":"lime juice","g":"lime"},{"a":1,"u":"cup","n":"sour cream","g":"sour"},{"a":1,"u":"cup","n":"fiesta shredded cheese","g":"fiesta"},{"a":0.25,"u":"cup","n":"cilantro, chopped","g":"cil"},{"a":1,"u":"bag","n":"tortilla chips","g":"chips"}],"steps":["Heat the oil in a big pot over medium. Cook the onion 5 min, then the garlic 1 min.","Add the broth, chicken, beans, green chiles, corn, cumin, oregano, chili powder, salt, and pepper. Mash about a cup of the beans against the side of the pot so it thickens.","Bring to a boil, then simmer 25 min, stirring now and then.","Cut the cream cheese into cubes and stir it in until melted. Stir in the lime juice.","Serve topped with sour cream, cheese, and cilantro, with chips on the side."]},
+"Chicken quesadillas":{"serves":6,"ing":[{"a":2,"u":"cup","n":"rice","g":"rice"},{"a":1,"u":"tbsp","n":"olive oil","g":"oil"},{"a":2,"u":"lb","n":"diced chicken breast","g":"diced"},{"a":1,"u":"packet","n":"taco seasoning","g":"tacosn"},{"a":1,"u":"can","n":"black beans, drained","g":"black"},{"a":12,"u":"","n":"flour tortillas","g":"ftort"},{"a":3,"u":"cup","n":"fiesta shredded cheese","g":"fiesta"},{"a":1,"u":"cup","n":"salsa","g":"salsa"},{"a":1,"u":"cup","n":"sour cream","g":"sour"},{"a":2,"u":"tbsp","n":"lime juice","g":"lime"},{"a":0.25,"u":"cup","n":"cilantro, chopped","g":"cil"},{"a":0.5,"u":"tsp","n":"salt","g":"salt"}],"steps":["Start the rice.","Heat the oil in a large skillet over medium high. Cook the chicken 10 min until browned. Add the taco seasoning and 1/3 cup water and simmer 3 min. Stir in the black beans.","Heat the oven to 200 F to keep finished quesadillas warm. Heat a griddle or second skillet over medium.","Lay a tortilla on the griddle, cover half with cheese and chicken, add a little more cheese, and fold. Cook 2 to 3 min per side until golden. Keep them warm on a sheet pan in the oven.","Stir the lime juice, cilantro, and salt into the rice. Cut the quesadillas into wedges and serve with salsa, sour cream, and the cilantro lime rice."]},
+"Philly cheesesteaks":{"serves":6,"ing":[{"a":1,"u":"box","n":"Steak-umm sliced steaks (27 oz)","g":"phil"},{"a":2,"u":"","n":"bell peppers, sliced thin","g":"bell"},{"a":1,"u":"","n":"yellow onion, sliced thin","g":"onion"},{"a":8,"u":"oz","n":"sliced mushrooms","g":"mush"},{"a":2,"u":"tbsp","n":"butter","g":"butter"},{"a":1,"u":"tbsp","n":"olive oil","g":"oil"},{"a":1,"u":"tbsp","n":"Worcestershire sauce","g":"worc"},{"a":1,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":0.5,"u":"tsp","n":"salt","g":"salt"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":12,"u":"slices","n":"provolone","g":"prov"},{"a":8,"u":"","n":"French steak rolls","g":"srolls"},{"a":1,"u":"bag","n":"fries (32 oz)","g":"fries"}],"steps":["Heat the oven and bake the fries per the bag.","Melt the butter in a large skillet over medium high. Cook the peppers, onion, and mushrooms 8 to 10 min until soft and browned. Move them to a bowl.","Add the oil and the steak slices straight from frozen. Break them up with a spatula as they cook, 4 to 5 min. Season with the Worcestershire, garlic powder, salt, and pepper.","Stir the veggies back in. Divide the meat into 8 piles in the pan, lay provolone over each, cover, and let it melt 1 min.","Split and toast the rolls. Slide a spatula under each pile and tuck it into a roll. Serve with the fries."]},
+"Sheet pan kielbasa + potatoes":{"serves":6,"ing":[{"a":2,"u":"pack","n":"kielbasa (14 oz)","g":"kielbasa"},{"a":2.5,"u":"lb","n":"russet potatoes","g":"pot"},{"a":4,"u":"cup","n":"broccoli florets","g":"broc"},{"a":1,"u":"","n":"yellow onion, cut in wedges","g":"onion"},{"a":3,"u":"tbsp","n":"olive oil","g":"oil"},{"a":2,"u":"tsp","n":"Kinder's The Blend","g":"kinder"},{"a":1,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":1,"u":"tsp","n":"smoked paprika","g":"paprika"},{"a":0.5,"u":"tsp","n":"salt","g":"salt"}],"steps":["Heat the oven to 425 F. Cut the potatoes into 3/4 inch cubes.","Toss the potatoes with 2 tablespoons of the oil and half the Kinder's, garlic powder, paprika, and salt. Spread on two sheet pans and roast 20 min.","Slice the kielbasa into coins. Toss with the onion wedges, broccoli, the last tablespoon of oil, and the rest of the seasonings.","Stir the potatoes, add the kielbasa mix to both pans, and roast 20 to 25 min more until the potatoes are browned and crisp at the edges."]},
+"Beef + broccoli bowls":{"serves":6,"ing":[{"a":2.5,"u":"cup","n":"rice","g":"rice"},{"a":2,"u":"lb","n":"ground beef","g":"beef"},{"a":0.5,"u":"cup","n":"soy sauce","g":"soy"},{"a":0.33,"u":"cup","n":"brown sugar","g":"bsugar"},{"a":2,"u":"tbsp","n":"corn starch","g":"cstarch"},{"a":1,"u":"tbsp","n":"minced garlic","g":"garlic"},{"a":1,"u":"tsp","n":"ground ginger","g":"ginger"},{"a":6,"u":"cup","n":"broccoli florets","g":"broc"},{"a":1,"u":"tbsp","n":"sesame oil","g":"sesame"},{"a":0.25,"u":"tsp","n":"crushed red pepper","g":"pepflake"}],"steps":["Start the rice.","Whisk the sauce in a bowl: soy sauce, brown sugar, 3/4 cup water, corn starch, garlic, ginger, and crushed red pepper.","Brown the beef in a large skillet, about 8 min, and drain the fat. Microwave the broccoli per the bag.","Whisk the sauce again and pour it over the beef. Simmer 2 to 3 min until thick and glossy.","Stir in the broccoli and sesame oil. Serve over the rice."]},
+"Cheeseburger soup":{"serves":6,"ing":[{"a":1.5,"u":"lb","n":"ground beef","g":"beef"},{"a":4,"u":"tbsp","n":"butter","g":"butter"},{"a":1,"u":"","n":"yellow onion, diced","g":"onion"},{"a":1,"u":"cup","n":"carrot chips, chopped","g":"carrot"},{"a":2,"u":"stalk","n":"celery, diced","g":"celery"},{"a":2,"u":"lb","n":"russet potatoes, cubed","g":"pot"},{"a":4,"u":"cup","n":"chicken broth","g":"cbroth"},{"a":1,"u":"tsp","n":"garlic powder","g":"garpow"},{"a":1,"u":"tsp","n":"salt","g":"salt"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":0.25,"u":"cup","n":"flour","g":"flour"},{"a":2,"u":"cup","n":"milk","g":"milk"},{"a":2,"u":"cup","n":"shredded sharp cheddar","g":"ched"},{"a":1,"u":"loaf","n":"wheat bread for toast","g":"bread"}],"steps":["Brown the beef in a big pot, drain, and set it aside.","Melt the butter in the same pot. Cook the onion, carrots, and celery 5 min.","Add the broth, potatoes, garlic powder, salt, and pepper. Simmer 15 min until the potatoes are tender.","Whisk the flour into the milk until smooth. Stir it into the soup and simmer 3 to 5 min until it thickens.","Stir the beef back in and turn the heat to low. Add the cheddar a handful at a time until melted. Do not let it boil after the cheese goes in. Serve with buttered toast."]},
+"Honey garlic chicken":{"serves":6,"ing":[{"a":3,"u":"lb","n":"boneless chicken thighs","g":"thighs"},{"a":0.5,"u":"cup","n":"honey","g":"honey"},{"a":0.5,"u":"cup","n":"soy sauce","g":"soy"},{"a":0.25,"u":"cup","n":"ketchup","g":"ketch"},{"a":1,"u":"tbsp","n":"minced garlic","g":"garlic"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":2,"u":"tbsp","n":"corn starch","g":"cstarch"},{"a":2.5,"u":"cup","n":"rice","g":"rice"},{"a":4,"u":"cup","n":"broccoli florets","g":"broc"}],"steps":["Morning: lay the thighs in the crockpot. Whisk the honey, soy sauce, ketchup, garlic, and pepper and pour it over. Cook on low 6 hours.","At dinner: start the rice.","Lift out the chicken and cut it into bite size pieces. Pour the sauce into a saucepan.","Whisk the corn starch with 2 tablespoons water, stir it into the sauce, and simmer 2 to 3 min until thick. Toss the chicken back in the sauce.","Microwave the broccoli per the bag. Serve the chicken and sauce over rice with broccoli."]},
+"Zuppa Toscana":{"serves":6,"ing":[{"a":0.5,"u":"lb","n":"bacon","g":"bacon"},{"a":1,"u":"lb","n":"Italian sausage","g":"isaus"},{"a":1,"u":"","n":"yellow onion, diced","g":"onion"},{"a":1,"u":"tbsp","n":"minced garlic","g":"garlic"},{"a":0.5,"u":"tsp","n":"crushed red pepper","g":"pepflake"},{"a":6,"u":"cup","n":"chicken broth","g":"cbroth"},{"a":2,"u":"lb","n":"russet potatoes, sliced thin","g":"pot"},{"a":1,"u":"cup","n":"heavy cream","g":"hcream"},{"a":4,"u":"cup","n":"spinach","g":"spin"},{"a":0.5,"u":"tsp","n":"salt","g":"salt"},{"a":0.5,"u":"tsp","n":"black pepper","g":"pepper"},{"a":0.5,"u":"cup","n":"parmesan","g":"parm"},{"a":1,"u":"loaf","n":"garlic bread","g":"gbread"}],"steps":["Cook the bacon in a big pot until crisp. Remove, crumble, and leave the grease in the pot.","Brown the sausage in the grease, breaking it up, 6 to 8 min. Spoon off most of the fat.","Add the onion and cook 4 min, then the garlic and crushed red pepper for 1 min.","Add the broth and potatoes. Simmer 15 to 18 min until the potatoes are tender. Bake the garlic bread while it simmers.","Stir in the cream and spinach and cook 2 min until the spinach wilts. Add the salt and pepper. Serve topped with bacon and parmesan, with garlic bread."]}
 };
 var STRETCH={
 "Chicken bacon ranch wraps":{how:"Put out more lettuce and tomato, add a can of black beans to the chicken, and serve chips and salsa on the side. Tortillas stretch easily.",need:"Tortillas, chips and salsa, extra lettuce"},
@@ -454,9 +500,22 @@ var STRETCH={
 "Chicken pot pie":{how:"Make it in a bigger pan, add more peas, carrots, and potatoes to the filling, and top with more biscuits.",need:"Veg, biscuits"},
 "Meatloaf + mashed potatoes":{how:"Stretch the loaf with extra breadcrumbs and an egg. Mash more potatoes, and add green beans.",need:"Breadcrumbs, potatoes, green beans"},
 "Taco soup":{how:"Add broth, another can of beans, and more corn. Chips and cheese on top. Very forgiving.",need:"Broth, beans, corn"},
-"Nuggets + fries + veg":{how:"Bake the whole bag of nuggets and a second bag of fries. Add a salad.",need:"Nuggets, fries, salad"}
+"Nuggets + fries + veg":{how:"Bake the whole bag of nuggets and a second bag of fries. Add a salad.",need:"Nuggets, fries, salad"},
+"Chicken bacon ranch pasta":{how:"Cook a second box of penne and add an extra cup of milk and a handful of cheese to the sauce. Double the broccoli.",need:"Penne, milk, broccoli"},
+"Shepherd's pie":{how:"Stir an extra bag of frozen veggies or a can of beans into the filling and use the whole bag of potatoes on top. Serve with bread.",need:"Frozen veggies, potatoes, bread"},
+"French dip sandwiches":{how:"Slice the beef thinner, open more rolls, and bake the whole bag of fries. A salad fills in the rest.",need:"Rolls, fries, salad"},
+"Pulled pork sandwiches":{how:"The shoulder makes plenty. Add a second pack of buns and chips, or serve some over baked potatoes.",need:"Buns, chips"},
+"Baked potato bar":{how:"Bake one more potato per extra person. Warm a can of chili beans as another topping.",need:"Potatoes, chili beans"},
+"White chicken chili":{how:"Add another can of beans and a cup of broth. Put out more chips or make a pan of cornbread.",need:"Great northern beans, broth, chips"},
+"Chicken quesadillas":{how:"More tortillas and cheese, the second can of black beans in the filling, and extra rice.",need:"Tortillas, cheese, beans"},
+"Philly cheesesteaks":{how:"Add another pepper and onion to the pan and bake extra fries. A second box of steak covers a big crowd.",need:"Peppers, fries, sliced steak"},
+"Sheet pan kielbasa + potatoes":{how:"Add a third pan of potatoes and a pack of brats or hot dogs cut into coins.",need:"Potatoes, brats"},
+"Beef + broccoli bowls":{how:"Make extra rice and a second bag of broccoli. A fried egg on each bowl stretches the protein.",need:"Rice, broccoli, eggs"},
+"Cheeseburger soup":{how:"Add two more potatoes and a cup of milk. Serve with grilled cheese or extra toast.",need:"Potatoes, milk, bread"},
+"Honey garlic chicken":{how:"Add a bag of diced chicken to the crockpot and make extra rice.",need:"Diced chicken, rice"},
+"Zuppa Toscana":{how:"Add more potatoes and another carton of broth. Bake a second loaf of garlic bread.",need:"Potatoes, broth, garlic bread"}
 };
-var CILANTRO=["Chicken fajitas", "Chicken enchiladas", "Taco bar", "Baked nachos", "Chicken tortilla soup", "Taco soup"];
+var CILANTRO=["Chicken fajitas", "Chicken enchiladas", "Taco bar", "Baked nachos", "Chicken tortilla soup", "Taco soup", "Chicken quesadillas"];
 var FUN={5:1,6:1};
 var BATCH=[{id:"b1",n:"Eggs, extra 18 ct",q:1,p:2.17},{id:"b2",n:"Breakfast sausage roll",q:1,p:2.94},
  {id:"b3",n:"Burrito tortillas, extra",q:2,p:2.68},{id:"b4",n:"Hash browns, extra",q:1,p:3.42},
@@ -474,8 +533,8 @@ function iso(d){var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(
 function fromIso(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
 function dbet(a,b){return Math.round((strip(b)-strip(a))/86400000);}
 function seasonOf(d){var k=d.getMonth()*100+d.getDate();if(k>=501&&k<=814)return "summer";if(k>=815&&k<=1030)return "fall";if(k>=1101||k<=219)return "winter";return "spring";}
-function planFor(d){var s=seasonOf(d);return s==="fall"?FALL:s==="winter"?WINTER:s==="spring"?SPRING:SUMMER;}
-function baseMeal(d){var i=dbet(ANCHOR,d);var m=((i%28)+28)%28;return planFor(d)[Math.floor(m/7)][m%7];}
+function planFor(d){var s=seasonOf(d);if(s==="winter"&&strip(d)<WINTER_CUTOVER)return WINTER_OLD;return s==="fall"?FALL:s==="winter"?WINTER:s==="spring"?SPRING:SUMMER;}
+function baseMeal(d){var P=planFor(d),n=P.length*7;var i=dbet(ANCHOR,d);var m=((i%n)+n)%n;return P[Math.floor(m/7)][m%7];}
 function mealFor(d){var k=iso(d);if(swaps[k])return swaps[k];return baseMeal(d);}
 var DAYN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 var DAYA=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -1308,8 +1367,12 @@ function buildList(sd,days){
  });
  var chick=meals.filter(function(m){return /chicken|fajita|teriyaki|enchilada|alfredo|chow mein|stir fry|potsticker|nugget/i.test(m);}).length;
  if(chick>=4)out.push({it:{id:"diced3",wid:"621164712",n:"Diced chicken, extra bag",q:1,p:7.94,s:"Protein"},why:"heavy chicken stretch ("+chick+" meals)",q:1,need:true});
- var pepd=meals.filter(function(m){return /fajita|stir fry|pizza|sausage \+ peppers/i.test(m);}).length;
+ var pepd=meals.filter(function(m){return /fajita|stir fry|pizza|sausage \+ peppers|philly/i.test(m);}).length;
  if(pepd>=3)out.push({it:{id:"bell2",wid:"47770124",n:"Bell peppers, 2nd 3-pack",q:1,p:2.97,s:"Produce"},why:"pepper-heavy stretch ("+pepd+" meals)",q:1,need:true});
+ if(uniq.indexOf("Sheet pan kielbasa + potatoes")>=0)out.push({it:{id:"kiel2",wid:"5265533849",n:"Kielbasa, 2nd pack",q:1,p:2.97,s:"Protein"},why:"for Sheet pan kielbasa + potatoes",q:1,need:true});
+ (function(){var lb=0;meals.forEach(function(m){var r=RECIPE[m];if(!r||!r.ing)return;r.ing.forEach(function(i){if(i.g==="beef")lb+=(i.u==="lb"?i.a:0);});});
+  var hasBeef=out.some(function(x){return x.it.id==="beef";});var extra=Math.ceil(lb/3)-1;
+  if(hasBeef&&extra>0)out.push({it:{id:"beef2",wid:"47183723",n:"Ground beef, extra 3 lb roll",q:extra,p:19.87,s:"Protein"},why:"beef-heavy stretch ("+lb+" lb)",q:extra,need:true});})();
  if(uniq.indexOf("Sausage + peppers")>=0)out.push({it:{id:"isaus2",wid:"40711369",n:"Italian sausage, 2nd pack",q:1,p:3.92,s:"Protein"},why:"for Sausage + peppers",q:1,need:true});
  var bd=lastBatch?dbet(fromIso(lastBatch),sd):999;
  var batchDue=(bd>=28);
@@ -1352,7 +1415,7 @@ function viewShop(){
    var t0=trial.reduce(function(a,x){return a+(x.it.p||0)*(x.q||1);},0);
    var tgt=getBudget()*(days/7);
    if(t0>tgt){
-    var flexSorted=trial.filter(function(x){return x.it.flex;})
+    var flexSorted=trial.filter(function(x){return x.it.flex&&!x.need;})
       .sort(function(a,b){return (b.it.p*b.q)-(a.it.p*a.q);});
     var running=t0;
     for(var fi=0; fi<flexSorted.length && running>tgt; fi++){
@@ -1378,7 +1441,7 @@ function viewShop(){
      ? "Over by "+money(total-target)+". Push something to next order, or it eats into the untracked household spend."
      : money(target-total)+" left for toiletries, cleaners, spices, and anything else this week.")+'</div>';
   if(over){
-   var flex=r.items.filter(function(x){return x.it.flex&&inOrder(x);}).sort(function(a,b2){return (b2.it.p*b2.q)-(a.it.p*a.q);});
+   var flex=r.items.filter(function(x){return x.it.flex&&!x.need&&inOrder(x);}).sort(function(a,b2){return (b2.it.p*b2.q)-(a.it.p*a.q);});
    if(flex.length){
     var tr=document.createElement("div");tr.className="trim";
     tr.innerHTML='<div class="trim-h">Push to next order</div>';
@@ -1653,7 +1716,7 @@ tabs.forEach(function(p){document.getElementById(p[0]).addEventListener("click",
  tabs.forEach(function(q){document.getElementById(q[0]).classList.toggle("on",q[0]===p[0]);
   document.getElementById(q[1]).classList.toggle("hidden",q[1]!==p[1]);});});});
 viewTonight();viewShop();viewWeek();
-document.getElementById("foot").innerHTML="Four seasons, switching on their own. Dinners rotate every 28 days with no repeated protein or cuisine back to back.";
+document.getElementById("foot").innerHTML="Four seasons, switching on their own. Dinners rotate every 4 weeks (6 in winter) with no repeated protein or cuisine back to back.";
 var lk=iso(today);
 function roll(){if(iso(strip(new Date()))!==lk){location.reload();return;} if(syncKey()&&Date.now()-syncPulledAt>60000)syncPull();}
 if(syncKey())syncPull();
