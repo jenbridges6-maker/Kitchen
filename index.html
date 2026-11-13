@@ -532,7 +532,7 @@ function strip(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
 function iso(d){var m=d.getMonth()+1,dd=d.getDate();return d.getFullYear()+"-"+(m<10?"0":"")+m+"-"+(dd<10?"0":"")+dd;}
 function fromIso(s){var p=s.split("-");return new Date(+p[0],+p[1]-1,+p[2]);}
 function dbet(a,b){return Math.round((strip(b)-strip(a))/86400000);}
-function seasonOf(d){var k=d.getMonth()*100+d.getDate();if(k>=501&&k<=814)return "summer";if(k>=815&&k<=1030)return "fall";if(k>=1101||k<=219)return "winter";return "spring";}
+function seasonOf(d){var k=d.getMonth()*100+d.getDate();if(k>=501&&k<=814)return "summer";if(k>=815&&k<=1013)return "fall";if(k>=1014||k<=219)return "winter";return "spring";}
 function planFor(d){var s=seasonOf(d);if(s==="winter"&&strip(d)<WINTER_CUTOVER)return WINTER_OLD;return s==="fall"?FALL:s==="winter"?WINTER:s==="spring"?SPRING:SUMMER;}
 function baseMeal(d){var P=planFor(d),n=P.length*7;var i=dbet(ANCHOR,d);var m=((i%n)+n)%n;return P[Math.floor(m/7)][m%7];}
 function mealFor(d){var k=iso(d);if(swaps[k])return swaps[k];return baseMeal(d);}
